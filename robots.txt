@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://saulepranculyte.vercel.app/sitemap.xml

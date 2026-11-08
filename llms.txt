@@ -1,0 +1,14 @@
+# Saulė Pranculytė
+
+> UI/UX designer looking for a spring internship.
+
+## Projects
+- [Eldora](https://saulepranculyte.vercel.app/eldora): Intergenerational platform, where one’s shortcoming could become a beneficial transaction for another. Matches seniors (55-70) with young adults (18-26) through housing and care needs.
+- [DHL Care](https://saulepranculyte.vercel.app/dhl-care): From systemic scale to human care. White glove handling, live condition monitoring and a premium digital experience for fragile and sentimental parcels.
+- [LEKALAS](https://saulepranculyte.vercel.app/lekalas): A template-based journey of the next sewing project. Built on three interviews and key findings, with an interactive sizing model.
+
+## Research
+- UX research for each project is on its case study page: interviews, desk research, competitor analysis, scenarios, business and revenue models.
+
+## NGO work
+- [Cultural Alleys](https://culturalalleys.org/home): Project Manager and Design Architect. Designed the whole brand, designed the whole system of the website and coded it, made an animation and three posters, and helped curate, code and design a digital gallery project.
