@@ -3,7 +3,6 @@ Saulė's portfolio: a small pixel game.
 Title screen (img/title/)
   collage.jpg         the collage from Figma frame 1
   collage-pixel.png   the pixelated version from frame 2 (shown around the cursor)
-  reveal.svg          the stepped circle used for that reveal
 
 Game art (img/world/). Hand-drawn placeholders: replace them with your own art at the SAME size.
   iso.png             the isometric island, 320 x 200
@@ -14,7 +13,8 @@ Game art (img/world/). Hand-drawn placeholders: replace them with your own art a
 
 If your new art puts things in different places, edit the numbers in CONFIG at the top of script.js:
 where she stands at the fork, the walking route along each path, where the path labels sit,
-and the x position of every level / side quest stop.
+the x position of every level / side quest stop, and the flag at the end of the main path
+(reaching it takes her back to the island).
 
 Photography: put five photos in img/photography/ named 01.jpg ... 05.jpg.
 Edit their titles in index.html (search for "Photo 1"). Until then the album shows "photo coming soon".

@@ -10,7 +10,8 @@
       }
     },
     paths: {                  // img/world/<main|side>-ground.png: height 180, the street/path top at y = 150
-      main: { width: 1100, start: 70, stops: { lekalas: 315, eldora: 590, 'dhl-care': 885 } },
+      // flag: reaching this x walks her back to the island
+      main: { width: 1100, start: 70, flag: 1070, stops: { lekalas: 315, eldora: 590, 'dhl-care': 885 } },
       side: { width: 900, start: 70, stops: { ngo: 330, photography: 670 } }
     },
     groundY: 150, heroH: 37,  // hero size on the paths
@@ -20,6 +21,12 @@
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const sleep = ms => new Promise(r => setTimeout(r, ms));
+  // run fn(t) every frame for ms milliseconds, t going 0 → 1 (the clock starts at the first frame, so a slow start skips nothing)
+  const frames = (ms, fn) => new Promise(done => {
+    let t0;
+    const step = now => { t0 ??= now; const t = Math.min(1, (now - t0) / ms); fn(t); if (t < 1) requestAnimationFrame(step); else done(); };
+    requestAnimationFrame(step);
+  });
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -149,7 +156,7 @@
   const title = $('.title', game), art = $('.art', title);
   const isoView = $('.iso-view', game), isoBox = $('.iso-box', game);
   const line = $('.talk .line', game), stops = $$('.talk .stop', game);
-  const menu = $('#menu'), exitD = $('#exit');
+  const menu = $('#menu'), goIso = $('[data-goto="iso"]', menu);
   const touch = matchMedia('(max-width: 760px), (pointer: coarse)');
 
   let state = 'title', busy = false, way = 'main';
@@ -192,59 +199,137 @@
   const stopWalking = () => { dir = 0; goal = null; };
 
   /* --- 1. title screen --- */
+  // The pixel copy shows through cells of its own pixel grid around the pointer. While the pointer
+  // moves, the edge flickers, stray pixels spark and the cells left behind break up one by one.
+  const px = $('.px', title), GRID = 148;   // collage-pixel.png is 148 blocks across
+  const lit = new Map();                     // "col,row" -> time that cell goes dark
+  let mx = 0, my = 0, inside = false, movedAt = 0, revealing = false;
   title.style.touchAction = 'none';
-  const reveal = e => {
-    if (title.classList.contains('zooming')) return;
+  function revealFrame(now) {
+    const cw = art.clientWidth / GRID, r = (touch.matches ? 64 : 54) / cw, moving = now - movedAt < 140;
+    if (inside) {
+      const ci = mx / cw, cj = my / cw, n = Math.ceil(r + 3);
+      for (let i = Math.floor(ci - n); i <= ci + n; i++) {
+        for (let j = Math.floor(cj - n); j <= cj + n; j++) {
+          const d = Math.hypot(i + .5 - ci, j + .5 - cj), k = i + ',' + j;
+          if (d < r - 1.5) lit.set(k, moving ? now + 150 + Math.random() * 450 : Infinity);
+          else if (d < r + 1) {
+            if (!moving) d < r ? lit.set(k, Infinity) : lit.delete(k);
+            else if (!lit.has(k) && Math.random() < .15) lit.set(k, now + 40 + Math.random() * 200);
+          } else if (moving && d < r + 3 && Math.random() < .02) lit.set(k, now + 60 + Math.random() * 120);
+        }
+      }
+    }
+    let path = '', fading = false;
+    const c = cw.toFixed(2);
+    for (const [k, end] of lit) {
+      if (end < now) { lit.delete(k); continue; }
+      if (end !== Infinity) fading = true;
+      const [i, j] = k.split(',');
+      path += `M${(i * cw).toFixed(1)} ${(j * cw).toFixed(1)}h${c}v${c}h-${c}z`;
+    }
+    px.style.clipPath = path ? `path("${path}")` : '';
+    revealing = moving || fading;
+    if (revealing) requestAnimationFrame(revealFrame);
+  }
+  const kick = () => { if (!revealing) { revealing = true; requestAnimationFrame(revealFrame); } };
+  const point = e => {
+    if (busy) return;
     const r = art.getBoundingClientRect();
-    art.style.setProperty('--mx', e.clientX - r.left + 'px');
-    art.style.setProperty('--my', e.clientY - r.top + 'px');
-    title.classList.add('reveal');
+    mx = e.clientX - r.left;
+    my = e.clientY - r.top;
+    inside = true;
+    movedAt = performance.now();
+    kick();
   };
-  title.addEventListener('pointermove', reveal);
-  title.addEventListener('pointerdown', reveal);
-  title.addEventListener('pointerleave', () => title.classList.remove('reveal'));
-  title.addEventListener('pointerup', e => { if (e.pointerType === 'touch') title.classList.remove('reveal'); });
+  const away = () => {
+    inside = false;
+    const now = performance.now();
+    for (const k of lit.keys()) lit.set(k, now + Math.random() * 300);
+    kick();
+  };
+  title.addEventListener('pointermove', point);
+  title.addEventListener('pointerdown', point);
+  title.addEventListener('pointerleave', away);
+  title.addEventListener('pointerup', e => { if (e.pointerType === 'touch') away(); });
+
+  // "resume" picks up where she was last, also on a later visit
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem('saule-place')); } catch {}
+  function remember() {
+    if (state === 'title') return;
+    saved = { s: state, x: Math.round(heroX) };
+    try { localStorage.setItem('saule-place', JSON.stringify(saved)); } catch {}
+  }
+  addEventListener('pagehide', remember);
 
   function toTitle(replace) {
     cancelAnimationFrame(raf);
+    remember();
     show('title', replace);
-    title.classList.remove('zooming', 'reveal');
     if (!replace) $('.menu button', title).focus({ preventScroll: true });  // not on first load
   }
 
-  // Zoom into the mirror, break it into chunky pixels, then dissolve into the island.
-  async function startGame() {
+  // Leaving the title: the chosen item blinks, the picture breaks into ever bigger pixels
+  // (diving into the mirror for "start game"), then the blocks crumble away onto the next place.
+  async function leaveTitle(btn, dive, go) {
     if (busy) return;
     busy = true;
+    inside = false;
+    lit.clear();
+    px.style.clipPath = '';
     if (!reduce) {
-      title.classList.add('zooming');
-      await sleep(850);
-      const img = $('.px img', title);
-      await img.decode().catch(() => {});
-      const vw = innerWidth, vh = innerHeight, W = img.naturalWidth, H = img.naturalHeight;
-      const gx = .236, gy = .342, gw = .30, gh = .337;  // the mirror glass, as fractions of the picture
-      let sw = gw * W, sh = sw * vh / vw;
-      if (sh > gh * H) { sh = gh * H; sw = sh * vw / vh; }
-      const sx = (gx + gw / 2) * W - sw / 2, sy = (gy + gh / 2) * H - sh / 2;
-      const ctx = zoomCv.getContext('2d');
-      game.classList.add('pixelating');
-      for (const n of [120, 64, 36, 22]) {
-        zoomCv.width = n;
-        zoomCv.height = Math.max(1, Math.round(n * vh / vw));
-        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, zoomCv.width, zoomCv.height);
-        await sleep(160);
-      }
+      btn.classList.add('chosen');
+      await sleep(420);
+      btn.classList.remove('chosen');
+      title.classList.add('leaving');
+      await pixelate(dive);
     }
-    toIso();
-    if (!reduce) {
-      zoomCv.classList.add('fade');
-      await sleep(520);
-      game.classList.remove('pixelating');
-      zoomCv.classList.remove('fade');
-    }
-    title.classList.remove('zooming');
+    go();
+    if (!reduce) await crumble();
+    title.classList.remove('leaving');
     busy = false;
   }
+  async function pixelate(dive) {
+    const img = $('.base', title);
+    await img.decode().catch(() => {});
+    const vw = innerWidth, vh = innerHeight, W = img.naturalWidth, H = img.naturalHeight;
+    const r = art.getBoundingClientRect(), k = W / r.width;
+    const A = { x: -r.left * k, y: -r.top * k, w: vw * k };   // the part of the picture on screen now
+    let B = A;
+    if (dive) {                                                // past the mirror glass, into its middle
+      const gx = .236, gy = .342, gw = .30, gh = .337, w = Math.min(gw * W, gh * H * vw / vh) * .55;
+      B = { x: (gx + gw / 2) * W - w / 2, y: (gy + gh / 2) * H - w * vh / vw / 2, w };
+    }
+    // zoom about the one point that stays put between the two views
+    const z = B.w / A.w, fx = z === 1 ? 0 : (B.x - A.x * z) / (1 - z), fy = z === 1 ? 0 : (B.y - A.y * z) / (1 - z);
+    const ctx = zoomCv.getContext('2d');
+    game.classList.add('pixelating');
+    await frames(dive ? 1150 : 450, t => {
+      const q = z ** (t * t), w = A.w * q, cell = Math.round(1 + t ** 2.4 * (dive ? 36 : 24));
+      zoomCv.width = Math.ceil(vw / cell);
+      zoomCv.height = Math.ceil(vh / cell);
+      ctx.drawImage(img, fx - (fx - A.x) * q, fy - (fy - A.y) * q, w, w * vh / vw, 0, 0, zoomCv.width, zoomCv.height);
+      const shake = dive && t > .6 ? (t - .6) * 16 : 0;      // the camera judders as it hits the glass
+      zoomCv.style.translate = shake ? `${(Math.random() - .5) * shake}px ${(Math.random() - .5) * shake}px` : '';
+    });
+  }
+  async function crumble() {
+    const ctx = zoomCv.getContext('2d'), W = zoomCv.width, H = zoomCv.height, order = [];
+    for (let i = 0; i < W; i++) for (let j = 0; j < H; j++) order.push([i, j, Math.hypot(i / W - .5, j / H - .5) + Math.random() * .45]);
+    order.sort((a, b) => a[2] - b[2]);   // from the middle outwards, raggedly
+    let n = 0;
+    await frames(700, t => { for (const to = Math.round(t * order.length); n < to; n++) ctx.clearRect(order[n][0], order[n][1], 1, 1); });
+    game.classList.remove('pixelating');
+    zoomCv.style.translate = '';
+  }
+  const startGame = (btn = $('[data-menu="start"]', title)) =>
+    leaveTitle(btn, true, () => { toIso(); isoBox.classList.add('arrive'); });
+  const resume = btn => {
+    const p = saved && Object.hasOwn(CONFIG.paths, saved.s) && Number.isFinite(saved.x) ? saved : null;
+    leaveTitle(btn, false, () => (p ? enterPath(p.s, p.x) : toIso()));
+  };
+  isoBox.addEventListener('animationend', e => { if (e.target === isoBox) isoBox.classList.remove('arrive'); });
 
   /* --- 2. the island --- */
   function setIso(x, y) { hx = x; hy = y; hero.style.setProperty('--x', x); hero.style.setProperty('--y', y); }
@@ -333,7 +418,8 @@
     hero.style.setProperty('--y', CONFIG.groundY);
     hero.dataset.pose = 'side';
     hero.classList.remove('flip', 'walking');
-    heroX = at ? P.stops[at] : P.start;
+    // at: a stop's name, or an x position when resuming
+    heroX = typeof at === 'number' ? clamp(at, P.start, (P.flag || P.width) - 20) : at ? P.stops[at] : P.start;
     stopWalking();
     near = undefined;
     layout();
@@ -378,7 +464,7 @@
       hero.dataset.pose = 'side';
       hero.classList.toggle('flip', d < 0);
       hero.classList.add('walking');
-      if (heroX < 8) { leavePath(); return; }
+      if (heroX < 8 || heroX >= P.flag) { leavePath(); return; }
       heroX = Math.min(heroX, P.width - 16);
     } else {
       hero.classList.remove('walking');
@@ -417,7 +503,7 @@
       }
       return;
     }
-    if (e.key === 'Escape') { e.preventDefault(); stopWalking(); return menu.showModal(); }
+    if (e.key === 'Escape') { e.preventDefault(); return pause(); }
     const onControl = e.target.closest('a, button');
     if (state === 'iso') {
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
@@ -434,9 +520,9 @@
   addEventListener('blur', stopWalking);
 
   $$('.menu button', title).forEach(b => b.addEventListener('click', () => {
-    if (b.dataset.menu === 'start') startGame();
+    if (b.dataset.menu === 'start') startGame(b);
     if (b.dataset.menu === 'about') openLocal($('#about-me'));
-    if (b.dataset.menu === 'exit') exitD.showModal();
+    if (b.dataset.menu === 'resume') resume(b);
   }));
   $$('.way', isoBox).forEach(b => b.addEventListener('click', () => goWay(b.dataset.way)));
   $$('.spot', game).forEach(b => b.addEventListener('click', () => {
@@ -455,8 +541,13 @@
     ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => b.addEventListener(t, () => { if (dir === v) dir = 0; }));
   });
   $('.pad .ab', game).addEventListener('click', () => act('a'));
-  $('.pause', game).addEventListener('click', () => { stopWalking(); menu.showModal(); });
-  $('[data-goto="iso"]', menu).addEventListener('click', () => {
+  function pause() {
+    stopWalking();
+    goIso.textContent = state === 'main' || state === 'side' ? 'Exit to world map' : 'World map';
+    menu.showModal();
+  }
+  $('.pause', game).addEventListener('click', pause);
+  goIso.addEventListener('click', () => {
     menu.close();
     if (state === 'main' || state === 'side') leavePath();
     else if (state !== 'iso') toIso();
@@ -465,6 +556,7 @@
   addEventListener('resize', () => {
     if (state === 'main' || state === 'side') { layout(); render(); }
     if (state === 'iso') isoLayout();
+    if (state === 'title') kick();
   });
 
   // Links like /#eldora, /#side-quests or /#contacts jump straight to that place.
