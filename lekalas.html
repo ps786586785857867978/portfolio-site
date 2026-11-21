@@ -18,11 +18,10 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://api.fontshare.com">
     <link
-        href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500&amp;family=Newsreader:wght@400;600&amp;family=DM+Sans:wght@300;400;500&amp;family=Fraunces:wght@400;600&amp;family=Sofia+Sans:wght@200;300;400;500&amp;display=swap"
+        href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&amp;family=Pixelify+Sans:wght@400;500;700&amp;display=swap"
         rel="stylesheet">
-    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500&amp;display=swap" rel="stylesheet">
+    <link rel="preload" href="/fonts/hallasan-subset.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/style.css">
     <script
         type="application/ld+json">{"@context": "https://schema.org", "@type": "CreativeWork", "name": "LEKALAS", "description": "Case study: LEKALAS, a template-based journey of the next sewing project. Three interviews, key findings and recommendations, and an interactive sizing model.", "author": {"@type": "Person", "name": "Saulė Pranculytė"}, "url": "https://saulepranculyte.vercel.app/lekalas"}</script>
@@ -30,10 +29,10 @@
 
 <body>
     <a class="skip" href="#main">Skip to content</a>
-    <header>
+    <header class="hud">
         <div class="in"><a href="/">Saulė Pranculytė</a>
-            <nav aria-label="Main"><a href="/#work">Student work</a><a href="/#research">UX research</a><a
-                    href="/#ngo">NGO work</a><a href="/#about">About</a><a href="/#contact">Contact</a></nav>
+            <nav aria-label="Main"><a href="/#main-path">Main path</a><a href="/#side-quests">Side quests</a><a
+                    href="/#about">About</a><a href="/#contacts">Contacts</a><a href="/media/cv.pdf">CV</a></nav>
         </div>
     </header>
     <main id="main" class="">
@@ -374,11 +373,11 @@
             </div>
         </article>
         <div class="wrap">
-            <nav class="pn" aria-label="Other projects"><a href="/dhl-care">Previous: DHL Care</a><a href="/">All
-                    work</a><a href="/eldora">Next: Eldora</a></nav>
+            <nav class="pn" aria-label="Other levels"><a href="/dhl-care">Previous: Level 3: DHL Care</a><a href="/#lekalas">Back to the main path</a><a href="/eldora">Next: Level 2: Eldora</a></nav>
         </div>
     </main>
     <footer>&copy; 2026 Saulė Pranculytė</footer>
+    <script src="/script.js"></script>
 </body>
 
 </html>

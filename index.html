@@ -1,332 +1,198 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="is-game">
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Saulė Pranculytė | UI/UX designer portfolio</title>
     <meta name="description"
-        content="Portfolio of Saulė Pranculytė, UI/UX designer looking for a spring internship: Eldora, DHL Care, LEKALAS, UX research and her work for Cultural Alleys.">
+        content="Portfolio of Saulė Pranculytė, UI/UX designer looking for a spring internship: LEKALAS, Eldora, DHL Care, NGO work for Cultural Alleys and personal photography.">
     <link rel="canonical" href="https://saulepranculyte.vercel.app/">
     <meta property="og:type" content="website">
     <meta property="og:title" content="Saulė Pranculytė | UI/UX designer portfolio">
     <meta property="og:description"
-        content="Portfolio of Saulė Pranculytė, UI/UX designer looking for a spring internship: Eldora, DHL Care, LEKALAS, UX research and her work for Cultural Alleys.">
+        content="Portfolio of Saulė Pranculytė, UI/UX designer looking for a spring internship: LEKALAS, Eldora, DHL Care, NGO work for Cultural Alleys and personal photography.">
     <meta property="og:url" content="https://saulepranculyte.vercel.app/">
     <meta property="og:image" content="https://saulepranculyte.vercel.app/media/og.png">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://api.fontshare.com">
     <link
-        href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500&amp;family=Newsreader:wght@400;600&amp;family=DM+Sans:wght@300;400;500&amp;family=Fraunces:wght@400;600&amp;family=Sofia+Sans:wght@200;300;400;500&amp;display=swap"
+        href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&amp;family=Pixelify+Sans:wght@400;500;700&amp;display=swap"
         rel="stylesheet">
-    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500&amp;display=swap" rel="stylesheet">
+    <link rel="preload" href="/fonts/hallasan-subset.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/style.css">
+    <link rel="preload" as="image" href="/img/title/collage.jpg">
+    <!-- without JavaScript the game cannot run, so show the plain content instead -->
+    <noscript>
+        <style>
+            .game { display: none !important }
+            .vault { display: block !important }
+            html.is-game, html.is-game body { height: auto; overflow: auto }
+        </style>
+    </noscript>
     <script
         type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "name": "Saulė Pranculytė", "jobTitle": "UI/UX designer", "url": "https://saulepranculyte.vercel.app", "email": "saulepranculyte@gmail.com", "sameAs": ["https://www.linkedin.com/in/saul%C4%97-p-7a31a6396/"], "worksFor": {"@type": "Organization", "name": "Cultural Alleys", "url": "https://culturalalleys.org"}}</script>
 </head>
 
 <body>
-    <a class="skip" href="#main">Skip to content</a>
-    <header>
-        <div class="in"><a href="/">Saulė Pranculytė</a>
-            <nav aria-label="Main"><a href="/#work">Student work</a><a href="/#research">UX research</a><a
-                    href="/#ngo">NGO work</a><a href="/#about">About</a><a href="/#contact">Contact</a></nav>
-        </div>
-    </header>
-    <main id="main" class="">
-        <section class="hero">
-            <div class="wrap">
-                <div>
-                    <h1>Saulė <br>Pranculytė</h1>
-                    <p class="role">UI/UX designer</p>
-                    <div class="btns"><a class="btn" href="#work">See my work</a><a class="btn"
-                            href="/media/cv.pdf">Download CV</a></div>
+    <div class="game" data-state="title">
+        <h1 class="sr">Saulė Pranculytė, UI/UX designer: portfolio</h1>
+
+        <!-- 1. Title screen. The pixel copy shows only around the cursor. -->
+        <section class="scene title" data-scene="title" aria-label="Title screen">
+            <div class="art">
+                <img class="base" src="/img/title/collage.jpg" width="2600" height="1735"
+                    alt="Collage: Saulė photographing herself in an old mirror above a washstand">
+                <p class="wordmark" aria-hidden="true">PORTFOLIO</p>
+                <nav class="menu" aria-label="Main menu">
+                    <button type="button" data-menu="start">start game</button>
+                    <button type="button" data-menu="about">about</button>
+                    <button type="button" data-menu="exit">exit</button>
+                </nav>
+                <div class="px" aria-hidden="true">
+                    <img src="/img/title/collage-pixel.png" width="4096" height="2734" alt="">
+                    <div class="menu ghost"><span>start game</span><span>about</span><span>exit</span></div>
                 </div>
-                <div class="hero-pic">
-                    <figure class="polaroid wide"><img src="/img/photos/hero.webp"
-                            alt="Saulė Pranculytė standing on a path in an autumn park, a stone pagoda behind her"
-                            width="1400" height="934"></figure>
+            </div>
+            <a class="skip-link" href="#main-path">Skip to projects</a>
+        </section>
+
+        <!-- 2. The isometric island with two paths -->
+        <section class="scene iso" data-scene="iso" aria-label="World map">
+            <div class="iso-view">
+                <div class="iso-box">
+                    <img class="map" src="/img/world/iso.png" width="320" height="200"
+                        alt="A floating pixel garden island. From a signpost, one path leads left to a gallery and a camera, the other right to a town gate.">
+                    <button class="way" type="button" data-way="side">Side quests <small>NGO work, photography</small></button>
+                    <button class="way" type="button" data-way="main">Main path <small>Uni projects</small></button>
                 </div>
             </div>
         </section>
-        <section class="work-head" id="work">
-            <div class="wrap">
-                <h2 class="t">Student work</h2>
+
+        <!-- 3. The two paths, side-scrolling -->
+        <section class="scene path main" data-scene="main" aria-label="Main path: uni projects">
+            <div class="layer sky"></div>
+            <div class="layer far"></div>
+            <div class="track">
+                <img class="ground" src="/img/world/main-ground.png" width="1100" height="180"
+                    alt="A town street with a tailor's workshop, a family house with a garden and a delivery depot">
+                <button class="spot" type="button" data-stop="lekalas"><span class="sr">Walk to Level 1: LEKALAS</span></button>
+                <button class="spot" type="button" data-stop="eldora"><span class="sr">Walk to Level 2: Eldora</span></button>
+                <button class="spot" type="button" data-stop="dhl-care"><span class="sr">Walk to Level 3: DHL Care</span></button>
             </div>
         </section>
-        <section class="proj eldora" id="eldora">
-            <div class="wrap">
-                <div class="ptxt">
-                    <h3>Eldora</h3>
-                    <p class="q">Bridge generations by strengthening community through advantageous connections and
-                        housing.</p>
-                    <h4>Target group</h4>
-                    <ul class="tg">
-                        <li>18-26 years olds anticipating budget friendly housing</li>
-                        <li>55-70 years olds in need for help with household tasks</li>
-                    </ul>
-                    <div class="art">
-                        <div class="tiles">
-                            <div class="tile" style="background:#E7E2DB"><img src="/img/eldora/logo.webp"
-                                    alt="Eldora logo" width="804" height="886" loading="lazy"></div>
-                            <div class="tile sq" style="background:#F2EEE4"><img src="/img/eldora/icon.webp"
-                                    alt="Eldora app icon" width="578" height="565" loading="lazy"></div>
-                        </div>
-                        <ul class="chips" aria-label="Colour palette">
-                            <li style="background:#925A5A"><span class="sr">#925A5A</span></li>
-                            <li style="background:#3F5352"><span class="sr">#3F5352</span></li>
-                            <li style="background:#888276"><span class="sr">#888276</span></li>
-                            <li style="background:#ECEDE6"><span class="sr">#ECEDE6</span></li>
-                            <li style="background:#87896D"><span class="sr">#87896D</span></li>
-                        </ul>
-                        <p class="fonts">Fraunces and DM Sans</p>
-                    </div>
-                    <div class="mini">
-                        <div class="stats">
-                            <div class="stat"><b>20%</b><span>of older Europeans now live alone</span></div>
-                            <div class="stat"><b>47%</b><span>of seniors in the EU occupy underutilized dwellings</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="btns"><a class="btn" href="/eldora" data-case>Read the case study</a><a class="btn"
-                            href="/eldora#research" data-case>Research</a></div>
-                </div>
-                <div class="pshots">
-                    <div class="shots">
-                        <div class="ph"><img src="/img/eldora/weekly-tasks.webp" alt="Eldora weekly tasks page"
-                                width="393" height="852" loading="lazy"></div>
-                        <div class="ph"><img src="/img/eldora/tenant-profile.webp" alt="Eldora tenant profile"
-                                width="393" height="1170" loading="lazy"></div>
-                        <div class="ph"><img src="/img/eldora/management.webp"
-                                alt="Eldora management mode with manage payments and contract" width="393" height="854"
-                                loading="lazy"></div>
-                    </div>
-                </div>
+        <section class="scene path side" data-scene="side" aria-label="Side quests: NGO work and photography">
+            <div class="layer sky"></div>
+            <div class="layer far"></div>
+            <div class="track">
+                <img class="ground" src="/img/world/side-ground.png" width="900" height="180"
+                    alt="A park path with a small gallery with banners and a camera on a tripod by a line of pinned photos">
+                <button class="spot" type="button" data-stop="ngo"><span class="sr">Walk to NGO work</span></button>
+                <button class="spot" type="button" data-stop="photography"><span class="sr">Walk to Photography</span></button>
             </div>
         </section>
-        <section class="proj dhl flip" id="dhl-care">
-            <div class="wrap">
-                <div class="ptxt">
-                    <h3>DHL Care</h3>
-                    <p class="q">From systemic SCALE to human CARE.</p>
-                    <h4>Target group</h4>
-                    <ul class="tg">
-                        <li>Age: 18+</li>
-                        <li>Income: mid to high earning</li>
-                        <li>Shipping behaviour: occasional to frequent shipping of fragile, valuable, or sentimental
-                            items</li>
-                    </ul>
-                    <div class="art">
-                        <div class="tiles">
-                            <div class="tile" style="background:#54363C"><img src="/img/dhl-care/logo.svg"
-                                    alt="DHL Care logo" width="332" height="144" loading="lazy"></div>
-                            <div class="tile sq" style="background:#353740"><img src="/img/dhl-care/icon-light.svg"
-                                    alt="DHL Care app icon" width="113" height="113" loading="lazy"></div>
-                        </div>
-                        <ul class="chips" aria-label="Colour palette">
-                            <li style="background:#54363C"><span class="sr">#54363C</span></li>
-                            <li style="background:#24262C"><span class="sr">#24262C</span></li>
-                            <li style="background:#FCFAE7"><span class="sr">#FCFAE7</span></li>
-                            <li style="background:#353740"><span class="sr">#353740</span></li>
-                            <li style="background:#36543B"><span class="sr">#36543B</span></li>
-                            <li style="background:#5A5237"><span class="sr">#5A5237</span></li>
-                            <li style="background:#6B6767"><span class="sr">#6B6767</span></li>
-                            <li style="background:#BBB8B8"><span class="sr">#BBB8B8</span></li>
-                            <li style="background:#E3E2E2"><span class="sr">#E3E2E2</span></li>
-                        </ul>
-                        <p class="fonts">Sofia Sans</p>
-                    </div>
-                    <div class="mini">
-                        <div class="stats">
-                            <div class="stat"><b>9.9%</b><span>CAGR of the global white glove services market</span>
-                            </div>
-                            <div class="stat"><b>30%</b><span>increase in customer satisfaction ratings after
-                                    implementing white glove delivery</span></div>
-                        </div>
-                    </div>
-                    <div class="btns"><a class="btn" href="/dhl-care" data-case>Read the case study</a><a class="btn"
-                            href="/dhl-care#research" data-case>Research</a></div>
-                </div>
-                <div class="pshots">
-                    <div class="shots">
-                        <div class="ph"><img src="/img/dhl-care/home.webp" alt="DHL Care home screen" width="402"
-                                height="874" loading="lazy"></div>
-                        <div class="ph"><img src="/img/dhl-care/shipping-details.webp"
-                                alt="DHL Care shipping details form" width="402" height="1447" loading="lazy"></div>
-                        <div class="ph"><img src="/img/dhl-care/parcel-page.webp"
-                                alt="DHL Care shipping history with tracker report" width="402" height="874"
-                                loading="lazy"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section class="proj lek" id="lekalas">
-            <div class="wrap">
-                <div class="ptxt">
-                    <h3>LEKALAS</h3>
-                    <p class="q">A template-based journey of your next sewing project.</p>
-                    <h4>Target group</h4>
-                    <ul class="tg">
-                        <li>People who sew, at three levels of knowledge: novice, intermediate and professional</li>
-                    </ul>
-                    <div class="art">
-                        <div class="tiles">
-                            <div class="tile" style="background:#F4F1F1"><img src="/img/lekalas/logo.svg"
-                                    alt="LEKALAS logo" width="1326" height="216" loading="lazy"></div>
-                            <div class="tile sq" style="background:#F4F1F1"><img src="/img/lekalas/icon.svg"
-                                    alt="LEKALAS icon, a pattern piece" width="711" height="787" loading="lazy"></div>
-                        </div>
-                        <ul class="chips" aria-label="Colour palette">
-                            <li style="background:#000000"><span class="sr">#000000</span></li>
-                            <li style="background:#615151"><span class="sr">#615151</span></li>
-                            <li style="background:#737373"><span class="sr">#737373</span></li>
-                            <li style="background:#984E4E"><span class="sr">#984E4E</span></li>
-                            <li style="background:#B9B9B9"><span class="sr">#B9B9B9</span></li>
-                            <li style="background:#FFFFFF"><span class="sr">#FFFFFF</span></li>
-                        </ul>
-                        <p class="fonts">Satoshi</p>
-                    </div>
-                    <div class="mini">
-                        <div class="stats">
-                            <div class="stat"><b>3</b><span>interviews, all online, in the Lithuanian language</span>
-                            </div>
-                            <div class="stat"><b>21‑55</b><span>years old, the three participants</span></div>
-                        </div>
-                    </div>
-                    <div class="btns"><a class="btn" href="/lekalas" data-case>Read the case study</a><a class="btn"
+
+        <div class="hero" aria-hidden="true"></div>
+        <div class="iris" aria-hidden="true"></div>
+        <canvas class="zoom" aria-hidden="true"></canvas>
+
+        <!-- Dialogue box, after the circled ref: portrait + text -->
+        <div class="talk">
+            <div class="face" aria-hidden="true"></div>
+            <div class="bubble" aria-live="polite">
+                <p class="line"></p>
+                <article class="stop lek" data-stop="lekalas" hidden>
+                    <p class="name">Level 1 · LEKALAS</p>
+                    <p>A template-based journey of your next sewing project.</p>
+                    <div class="btns"><a class="btn" href="/lekalas" data-case>Open case study</a><a class="btn alt"
                             href="/lekalas#research" data-case>Research</a></div>
-                </div>
-                <div class="pshots">
-                    <div class="bw">
-                        <div class="bar"><i></i><i></i><i></i></div><img src="/img/lekalas/template-library.webp"
-                            alt="LEKALAS template library" width="1400" height="909" loading="lazy">
-                    </div>
-                </div>
+                </article>
+                <article class="stop eldora" data-stop="eldora" hidden>
+                    <p class="name">Level 2 · Eldora</p>
+                    <p>Bridge generations by strengthening community through advantageous connections and housing.</p>
+                    <div class="btns"><a class="btn" href="/eldora" data-case>Open case study</a><a class="btn alt"
+                            href="/eldora#research" data-case>Research</a></div>
+                </article>
+                <article class="stop dhl" data-stop="dhl-care" hidden>
+                    <p class="name">Level 3 · DHL Care</p>
+                    <p>From systemic SCALE to human CARE.</p>
+                    <div class="btns"><a class="btn" href="/dhl-care" data-case>Open case study</a><a class="btn alt"
+                            href="/dhl-care#research" data-case>Research</a></div>
+                </article>
+                <article class="stop side" data-stop="ngo" hidden>
+                    <p class="name">Side quest · NGO work</p>
+                    <p>Cultural Alleys: I am its Project Manager and Design Architect. Brand, website, animation, posters
+                        and a digital gallery.</p>
+                    <div class="btns"><a class="btn" href="#alleys" data-sheet>Open the book</a><a class="btn alt"
+                            href="https://culturalalleys.org/home" rel="noopener">culturalalleys.org</a></div>
+                </article>
+                <article class="stop side" data-stop="photography" hidden>
+                    <p class="name">Side quest · Photography</p>
+                    <p>My personal photography.</p>
+                    <div class="btns"><a class="btn" href="#photos" data-sheet>Open the album</a></div>
+                </article>
             </div>
-        </section>
-        <section class="sec" id="research">
+        </div>
+
+        <button class="pause" type="button" aria-haspopup="dialog">menu</button>
+        <div class="pad">
+            <button type="button" class="dir" data-dir="-1" aria-label="Walk left"></button>
+            <button type="button" class="dir" data-dir="1" aria-label="Walk right"></button>
+            <button type="button" class="ab" data-act="a" aria-label="Select">A</button>
+        </div>
+    </div>
+
+    <dialog id="menu" aria-labelledby="menu-h">
+        <h2 id="menu-h">Paused</h2>
+        <ul>
+            <li><form method="dialog"><button>Resume</button></form></li>
+            <li><button type="button" data-goto="iso">World map</button></li>
+            <li><a href="#about-me" data-sheet>About &amp; contacts</a></li>
+            <li><button type="button" data-goto="title">Title screen</button></li>
+            <li><a href="/media/cv.pdf">CV (PDF)</a></li>
+        </ul>
+    </dialog>
+
+    <dialog id="exit" aria-labelledby="exit-h">
+        <p id="exit-h">Just close the tab manually.</p>
+        <form method="dialog"><button>OK</button></form>
+    </dialog>
+
+    <dialog id="book" aria-label="Book">
+        <div class="book">
+            <nav class="tabs" aria-label="Chapters"></nav>
+            <div class="pages">
+                <div class="flow"></div>
+            </div>
+            <span class="rings" aria-hidden="true"></span>
+            <button type="button" class="turn prev" aria-label="Previous page"></button>
+            <button type="button" class="turn next" aria-label="Next page"></button>
+            <p class="folio"></p>
+            <form method="dialog"><button class="close" aria-label="Close the book"></button></form>
+        </div>
+    </dialog>
+
+    <!-- Books opened from the game, and the whole page when JavaScript is off -->
+    <div class="vault">
+        <nav class="vault-nav" aria-label="Case studies">
+            <p>Saulė Pranculytė, UI/UX designer. Main path: <a href="/lekalas">LEKALAS</a>, <a
+                    href="/eldora">Eldora</a>, <a href="/dhl-care">DHL Care</a>. <a href="/media/cv.pdf">CV (PDF)</a></p>
+        </nav>
+
+        <article class="case player">
             <div class="wrap">
-                <h2 class="t">UX research</h2>
-                <p class="lead-in">Researching provided me with a great understanding of structured methods and how
-                    beneficial it is to seek widespread knowledge instead of relying on your own bias.</p>
-                <div class="rgrid">
-                    <div class="rcol">
-                        <h3>LEKALAS</h3>
-                        <ul class="list">
-                            <li>Interviews with a novice, an intermediate and a professional sewer</li>
-                            <li>Video calls, 20-40 minutes, in the Lithuanian language</li>
-                            <li>Key findings and recommendations, rated by impact</li>
-                        </ul><a class="btn" href="/lekalas#research" data-case>Read the research</a>
-                    </div>
-                    <div class="rcol">
-                        <h3>DHL Care</h3>
-                        <ul class="list">
-                            <li>Qualitative: 3 in-person interviews</li>
-                            <li>Quantitative: QuestionPro survey, 20 participants</li>
-                            <li>Desk research: market research and trend insights</li>
-                        </ul><a class="btn" href="/dhl-care#research" data-case>Read the research</a>
-                    </div>
-                    <div class="rcol">
-                        <h3>Eldora</h3>
-                        <ul class="list">
-                            <li>Two age demographics: seniors 55-70 and young adults 18-26</li>
-                            <li>Market research, competitor analysis and scenarios</li>
-                            <li>User journeys and user maps</li>
-                        </ul><a class="btn" href="/eldora#research" data-case>Read the research</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section class="sec alt" id="ngo">
-            <div class="wrap">
-                <h2 class="t">NGO work</h2>
-                <div class="ca-top">
-                    <div class="ca-txt"><img class="logo opt" src="/media/cultural-alleys-logo.png"
-                            alt="Cultural Alleys logo" height="56" onerror="this.hidden=true">
-                        <h3>Cultural Alleys</h3>
-                        <p>Cultural Alleys is a non-profit organisation based in Lithuania, which operates at the
-                            intersection of artistic practice, academic inquiry,
-                            and community engagement across various disciplines. I am its
-                            Project Manager and Design Architect.</p>
-                        <p> I created the organisation's complete brand and visual system. Coded the website and
-                            currently maintain it.
-                            Made the organisation's loading animation and the illustrations for the website.
-                            Additionally, I regularly create poster designs for organisation’s activities, anouncements,
-                            features.
-                            Last year, I helped to curate the digital gallery project "Fragments of Becoming" as well as
-                            coded and designed its interactive
-                            flipbook.</p>
-                        <div class="btns"><a class="btn" href="https://culturalalleys.org/home" rel="noopener">Visit
-                                culturalalleys.org</a></div>
-                    </div>
-                    <div class="anim"><img src="/img/ngo/animation.gif" alt="Animation made for Cultural Alleys"
-                            width="700" height="394" loading="lazy"></div>
-                </div>
-                <div class="ca-more">
-                    <div class="ca-gal">
-                        <figure>
-                            <div class="print" style="--r:.8deg;--t:-2deg"><img
-                                    src="/img/ngo/fragments-of-becoming.webp"
-                                    alt="Artwork from Fragments of Becoming, the digital gallery project of Cultural Alleys"
-                                    width="1100" height="1353" loading="lazy"></div>
-                        </figure>
-                        <div>
-                            <h3>Fragments of Becoming</h3>
-                            <p>The digital gallery project I helped curate, code and design. I coded the flipbook.</p>
-                            <div class="btns"><a class="btn" href="https://culturalalleys.org/mybook/index.html"
-                                    rel="noopener">Open the flipbook</a><a class="btn"
-                                    href="https://culturalalleys.org/fragmentsgallery.html" rel="noopener">Visit the 3D
-                                    gallery</a></div>
-                        </div>
-                    </div>
-                    <div class="ca-posters">
-                        <h3>Some of the posters I have designed for my NGO related activities.</h3>
-                        <div class="posters">
-                            <figure>
-                                <div class="print" style="--r:-1.2deg;--t:2deg"><img
-                                        src="/img/ngo/spotlight-tom-ang.webp"
-                                        alt="Artist Spotlight poster for Tom Ang, made for Cultural Alleys" width="800"
-                                        height="1422" loading="lazy"></div>
-                            </figure>
-                            <figure>
-                                <div class="print" style="--r:.9deg;--t:-3deg"><img
-                                        src="/img/ngo/spotlight-adriana-cassian.webp"
-                                        alt="Artist Spotlight poster for Adriana Cassian, made for Cultural Alleys"
-                                        width="800" height="1422" loading="lazy"></div>
-                            </figure>
-                            <figure>
-                                <div class="print" style="--r:-.6deg;--t:2deg"><img
-                                        src="/img/ngo/spotlight-trina-acacia.webp"
-                                        alt="Artist Spotlight poster for Trina Acacia, made for Cultural Alleys"
-                                        width="800" height="1422" loading="lazy"></div>
-                            </figure>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section class="sec about" id="about">
-            <div class="wrap about-g">
-                <figure class="polaroid about-pic"><img src="/img/photos/about.webp"
-                        alt="Saulė reaching up to touch hanging paper lanterns and leaves at a temple by the sea"
-                        width="900" height="1125" loading="lazy"></figure>
-                <div>
-                    <h2 class="t">About me</h2>
-                    <div class="about-b">
+                <div class="chead" id="about-me">
+                    <div>
+                        <h1>About me</h1>
                         <p>For as long as I can remember, I have always been drawn to art and technological
                             advancements. Choosing to study UX/UI seemed like a natural progression for the development
-                            of my skills. Past few years studying at Thomas More university have been a conitnous ladder
-                            towards creative improvement. Additionally, I am also learning animation and backend
-                            principles to
-                            widen what I can do. From February 2027, I am looking for a spring internship in a
-                            stimulating environment, where I can learn from the people around me and be useful to the
-                            company.</p>
-                        <p>Next comes a spring internship from February 2027.I would like to work in a stimulating
-                            environment where I could learn from others and make
-                            myself useful for the company.</p>
+                            of my skills. Past few years studying at Thomas More university have been a continuous
+                            ladder towards creative improvement. Additionally, I am also learning animation and backend
+                            principles to widen what I can do. From February 2027, I am looking for a spring internship
+                            in a stimulating environment, where I can learn from the people around me and be useful to
+                            the company.</p>
                         <dl class="idx">
                             <div>
                                 <dt>Code</dt>
@@ -346,27 +212,137 @@
                             </div>
                         </dl>
                     </div>
+                    <div class="frame"><img src="/img/photos/about.webp" loading="lazy" width="900" height="1125"
+                            alt="Saulė reaching up to touch hanging paper lanterns and leaves at a temple by the sea">
+                    </div>
                 </div>
+                <section class="blk" id="contacts">
+                    <h2>Contacts</h2>
+                    <p>Send a message to start the next level together.</p>
+                    <div class="contact-links">
+                        <a href="mailto:saulepranculyte@gmail.com">saulepranculyte@gmail.com</a>
+                        <a href="https://www.linkedin.com/in/saul%C4%97-p-7a31a6396/" rel="noopener">LinkedIn</a>
+                        <a href="/media/cv.pdf">CV (PDF)</a>
+                    </div>
+                </section>
             </div>
-        </section>
-        <section class="sec alt contact" id="contact">
-            <div class="wrap two">
-                <div>
-                    <h2 class="t" style="margin:0">Contact</h2>
+        </article>
+
+        <article class="case side">
+            <div class="wrap">
+                <div class="chead">
+                    <div><img class="logo opt" src="/media/cultural-alleys-logo.png" alt="Cultural Alleys logo"
+                            height="56" loading="lazy" onerror="this.hidden=true">
+                        <h1>NGO work</h1>
+                        <p class="lede">My work for Cultural Alleys, a non-profit organisation based in Lithuania.</p>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th>Role</th>
+                                    <td>Project Manager and Design Architect</td>
+                                </tr>
+                                <tr>
+                                    <th>Work</th>
+                                    <td>Brand and visual system, website, animation, illustrations, posters, digital
+                                        gallery</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="frame"><img src="/img/ngo/animation.gif" alt="Animation made for Cultural Alleys"
+                            width="700" height="394" loading="lazy"></div>
                 </div>
-                <div>
-                    <a class="big" href="mailto:saulepranculyte@gmail.com">saulepranculyte@gmail.com</a><a class="big"
-                        href="https://www.linkedin.com/in/saul%C4%97-p-7a31a6396/" rel="noopener">LinkedIn</a><a
-                        class="big" href="/media/cv.pdf">CV (PDF)</a>
-                </div>
+                <section class="blk" id="alleys">
+                    <h2>Cultural Alleys</h2>
+                    <p>Cultural Alleys is a non-profit organisation based in Lithuania, which operates at the
+                        intersection of artistic practice, academic inquiry, and community engagement across various
+                        disciplines. I am its Project Manager and Design Architect.</p>
+                    <p>I created the organisation's complete brand and visual system. Coded the website and currently
+                        maintain it. Made the organisation's loading animation and the illustrations for the website.
+                        Additionally, I regularly create poster designs for organisation’s activities, anouncements,
+                        features. Last year, I helped to curate the digital gallery project "Fragments of Becoming" as
+                        well as coded and designed its interactive flipbook.</p>
+                    <div class="links"><a class="btn" href="https://culturalalleys.org/home" rel="noopener">Visit
+                            culturalalleys.org</a></div>
+                </section>
+                <section class="blk" id="fragments">
+                    <h2>Fragments of Becoming</h2>
+                    <div class="frame"><img src="/img/ngo/fragments-of-becoming.webp" loading="lazy" width="1100"
+                            height="1353"
+                            alt="Artwork from Fragments of Becoming, the digital gallery project of Cultural Alleys">
+                    </div>
+                    <p>The digital gallery project I helped curate, code and design. I coded the flipbook.</p>
+                    <div class="links"><a class="btn" href="https://culturalalleys.org/mybook/index.html"
+                            rel="noopener">Open the flipbook</a><a class="btn alt"
+                            href="https://culturalalleys.org/fragmentsgallery.html" rel="noopener">Visit the 3D
+                            gallery</a></div>
+                </section>
+                <section class="blk" id="posters">
+                    <h2>Posters</h2>
+                    <p>Some of the posters I have designed for my NGO related activities.</p>
+                    <div class="posters">
+                        <div class="frame"><img src="/img/ngo/spotlight-tom-ang.webp" loading="lazy" width="800"
+                                height="1422" alt="Artist Spotlight poster for Tom Ang, made for Cultural Alleys">
+                        </div>
+                        <div class="frame"><img src="/img/ngo/spotlight-adriana-cassian.webp" loading="lazy"
+                                width="800" height="1422"
+                                alt="Artist Spotlight poster for Adriana Cassian, made for Cultural Alleys"></div>
+                        <div class="frame"><img src="/img/ngo/spotlight-trina-acacia.webp" loading="lazy" width="800"
+                                height="1422" alt="Artist Spotlight poster for Trina Acacia, made for Cultural Alleys">
+                        </div>
+                    </div>
+                </section>
             </div>
-        </section>
-    </main>
-    <footer>&copy; 2026 Saulė Pranculytė</footer>
-    <dialog id="case" aria-label="Case study">
-        <form method="dialog" class="dbar"><button class="x" autofocus>Close &times;</button></form>
-        <div class="cbody"></div>
-    </dialog>
+        </article>
+
+        <!-- Photography: drop 01.jpg ... 05.jpg into /img/photography/ and edit the titles below -->
+        <article class="case album">
+            <div class="wrap">
+                <div class="chead" id="photos">
+                    <div>
+                        <h1>Photography</h1>
+                        <p class="lede">My personal photography.</p>
+                    </div>
+                </div>
+                <section class="blk" id="photo-1">
+                    <h2>Photo 1</h2>
+                    <figure class="photo"><img src="/img/photography/01.jpg" loading="lazy" alt="Photograph 1 by Saulė"
+                            onerror="this.parentNode.classList.add('missing')">
+                        <figcaption>Untitled</figcaption>
+                    </figure>
+                </section>
+                <section class="blk" id="photo-2">
+                    <h2>Photo 2</h2>
+                    <figure class="photo"><img src="/img/photography/02.jpg" loading="lazy" alt="Photograph 2 by Saulė"
+                            onerror="this.parentNode.classList.add('missing')">
+                        <figcaption>Untitled</figcaption>
+                    </figure>
+                </section>
+                <section class="blk" id="photo-3">
+                    <h2>Photo 3</h2>
+                    <figure class="photo"><img src="/img/photography/03.jpg" loading="lazy" alt="Photograph 3 by Saulė"
+                            onerror="this.parentNode.classList.add('missing')">
+                        <figcaption>Untitled</figcaption>
+                    </figure>
+                </section>
+                <section class="blk" id="photo-4">
+                    <h2>Photo 4</h2>
+                    <figure class="photo"><img src="/img/photography/04.jpg" loading="lazy" alt="Photograph 4 by Saulė"
+                            onerror="this.parentNode.classList.add('missing')">
+                        <figcaption>Untitled</figcaption>
+                    </figure>
+                </section>
+                <section class="blk" id="photo-5">
+                    <h2>Photo 5</h2>
+                    <figure class="photo"><img src="/img/photography/05.jpg" loading="lazy" alt="Photograph 5 by Saulė"
+                            onerror="this.parentNode.classList.add('missing')">
+                        <figcaption>Untitled</figcaption>
+                    </figure>
+                </section>
+            </div>
+        </article>
+        <footer>&copy; 2026 Saulė Pranculytė</footer>
+    </div>
     <script src="/script.js"></script>
 </body>
 
