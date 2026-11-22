@@ -33,17 +33,14 @@
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 
   /* ================= books ================= */
-  // Short chapter names for the tabs, keyed by section id.
-  const MK = {
-    idea: 'The story', brand: 'Mission briefing', research: 'Research', scenarios: 'Characters', segments: 'Characters',
-    competitors: 'Rivals', competition: 'Rivals', interdependencies: 'Game mechanics', business: 'Economy', kpis: 'Scoring',
-    findings: 'Tips and tricks', reflection: "Developer's notes", identity: 'Art direction', screens: 'Stage select',
-    walkthrough: 'Gameplay', sources: 'Credits', alleys: 'Main stage', fragments: 'Bonus stage', posters: 'Collectibles'
+  // Chapters are numbered in order; the number sits in a tag above each chapter title.
+  const label = art => {
+    let n = 0;
+    $$('section.blk[id]', art).forEach(s => {
+      const h = $('h2', s);
+      if (h) h.dataset.ch = s.matches('.opt') ? 'Bonus' : 'Chapter ' + ++n;
+    });
   };
-  const label = art => $$('section.blk[id]', art).forEach(s => {
-    const h = $('h2', s);
-    if (h && MK[s.id]) h.dataset.mk = MK[s.id];
-  });
 
   // Standalone case study pages scroll, so they get a contents page instead of tabs.
   const standalone = $('main article.case');
@@ -55,9 +52,8 @@
     nav.innerHTML = '<h2>Contents</h2><ol></ol>';
     $$('section.blk[id]:not(.opt)', standalone).forEach((s, i) => {
       const li = document.createElement('li');
-      li.innerHTML = `<a href="#${s.id}"><span><small></small></span><i></i><b>${i + 3}</b></a>`;
-      $('small', li).textContent = MK[s.id] || '';
-      $('span', li).append($('h2', s).textContent);
+      li.innerHTML = `<a href="#${s.id}"><span></span><i></i><b>${i + 3}</b></a>`;
+      $('span', li).textContent = $('h2', s).textContent;
       $('ol', nav).append(li);
     });
     $('.chead', standalone).after(nav);
@@ -78,6 +74,17 @@
     const spreads = () => Math.max(1, Math.ceil((flow.scrollWidth + gap()) / pitch() - .02));
     const measure = () => {
       flow.style.setProperty('--ph', flow.clientHeight + 'px');
+      $$('.blank', flow).forEach(el => el.remove());
+      if (cols() === 2) {
+        // every chapter opens on a left-hand page, so a spread never mixes two chapters
+        const col = (flow.clientWidth - gap()) / 2 + gap();
+        book.pages.forEach(p => {
+          if (getComputedStyle(p).breakBefore !== 'column' || !(Math.round(p.offsetLeft / col) % 2)) return;
+          const blank = document.createElement('div');
+          blank.className = 'blank';
+          p.before(blank);
+        });
+      }
       book.starts = book.pages.map(p => Math.floor((p.offsetLeft + 2) / pitch()));
     };
     const turn = i => {
@@ -100,8 +107,7 @@
         const t = document.createElement('button');
         t.type = 'button';
         t.className = 'tab';
-        const h2 = $('h2', p);
-        t.textContent = p.matches('.chead') ? $('h1', p).textContent : (h2.dataset.mk || h2.textContent);
+        t.textContent = t.title = $(p.matches('.chead') ? 'h1' : 'h2', p).textContent;   // the chapter's own title
         t.addEventListener('click', () => turn(book.starts[k]));
         return t;
       }));
@@ -109,6 +115,7 @@
     };
     // put the open article back where it came from (a fetched one is just dropped)
     const putBack = () => {
+      $$('.blank', flow).forEach(el => el.remove());
       if (book.art && book.home) book.home.append(book.art); else flow.replaceChildren();
       book.art = null;
     };
@@ -117,7 +124,8 @@
       book.art = art;
       book.home = home;
       label(art);
-      $$('img', art).forEach(img => { img.loading = 'eager'; });
+      // pictures in hidden columns may never count as on screen, so load them now; album photos load page by page
+      $$('img', art).forEach(img => { if (!img.closest('.pic')) img.loading = 'eager'; });
       flow.replaceChildren(art);
       bookD.setAttribute('aria-label', $('h1', art).textContent);
       bookD.showModal();

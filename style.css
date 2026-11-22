@@ -209,7 +209,7 @@ dialog::backdrop { background: rgba(30, 28, 25, .6) }
 /* bookmarks along the top edge, tucked behind the cover; the open chapter stands up in page colour */
 .tabs { position: absolute; left: 44px; right: 96px; bottom: calc(100% - 10px); z-index: -2; display: flex; align-items: flex-end; gap: 4px; padding-top: 10px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none }
 .tabs::-webkit-scrollbar { display: none }
-.tab { flex: none; font: 500 .8rem/1 var(--pix); color: var(--ink); background: var(--tc); border: 0; padding: .6rem .75rem 1.2rem; translate: 0 8px; cursor: pointer; clip-path: polygon(0 4px, 4px 4px, 4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% 100%, 0 100%); transition: translate .1s steps(2) }
+.tab { flex: none; max-width: 14rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 .8rem/1 var(--pix); color: var(--ink); background: var(--tc); border: 0; padding: .6rem .75rem 1.2rem; translate: 0 8px; cursor: pointer; clip-path: polygon(0 4px, 4px 4px, 4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% 100%, 0 100%); transition: translate .1s steps(2) }
 .tab:nth-child(5n+1) { --tc: #E9B79A }
 .tab:nth-child(5n+2) { --tc: #C9D6C2 }
 .tab:nth-child(5n+3) { --tc: #E8D9A8 }
@@ -251,7 +251,7 @@ dialog::backdrop { background: rgba(30, 28, 25, .6) }
 .flow .chead > div + div img { max-height: calc(var(--ph, 560px) - 90px) }
 /* chapter opening: a filled tag with its game name, the title, then a dotted rule */
 .flow .case h2 { font-size: 2.05rem; margin-bottom: 1.3rem; padding-bottom: 1rem; background: radial-gradient(circle, color-mix(in srgb, var(--acc, var(--green)) 65%, transparent) 1.5px, transparent 2px) left bottom / 10px 4px repeat-x }
-.flow .case h2[data-mk]::before { display: table; font: 500 .74rem/1 var(--pix); color: var(--cream); background: var(--acc, var(--green)); padding: .4rem .6rem .35rem; margin-bottom: .8rem; clip-path: var(--notch) }
+.flow .case h2[data-ch]::before { display: table; font: 500 .74rem/1 var(--pix); color: var(--cream); background: var(--acc, var(--green)); padding: .4rem .6rem .35rem; margin-bottom: .8rem; clip-path: var(--notch) }
 .flow .blk h3.s { display: table; font-size: 1.12rem; padding: .4rem .7rem .3rem; margin: 1.7rem 0 .9rem; background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--acc, var(--green)) 17%, transparent) 0 6px, color-mix(in srgb, var(--acc, var(--green)) 8%, transparent) 6px 12px); clip-path: var(--notch) }
 .flow .blk h3.s:first-child { margin-top: 0 }
 .flow .card { --edge: color-mix(in srgb, var(--acc, var(--green)) 38%, transparent); margin: 2px 2px 1rem; box-shadow: 0 -2px 0 var(--edge), 0 2px 0 var(--edge), -2px 0 0 var(--edge), 2px 0 0 var(--edge) }
@@ -265,11 +265,17 @@ dialog::backdrop { background: rgba(30, 28, 25, .6) }
 .flow .bw, .flow .frame, .flow .lg { box-shadow: 5px 5px 0 rgba(46, 42, 38, .14) }
 .flow .ph { box-shadow: 4px 4px 0 rgba(46, 42, 38, .14) }
 
-/* the album: photos two to a row; one opens big on top of the book */
-.photos { font-size: 0; line-height: 0; orphans: 1; widows: 1 }  /* each row of photos is a line: let pages fill up */
-.pic { display: inline-block; width: calc(50% - 6px); margin: 0 12px 12px 0; vertical-align: top; padding: 5px; background: #fff; box-shadow: 3px 3px 0 rgba(46, 42, 38, .16); cursor: zoom-in }
-.pic:nth-child(2n) { margin-right: 0 }
-.pic img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover }
+/* a chapter that would open on a right-hand page gets an empty page first (see measure() in script.js) */
+.blank { break-before: column; height: 1px }
+
+/* the album: one big photo, then two side by side; whole photos, never taller than the page */
+.photos { font-size: 0; line-height: 0; orphans: 1; widows: 1; margin-top: 1.6rem; text-align: center }  /* each row of photos is a line: let pages fill up */
+.pic { display: inline-block; width: calc(50% - 6px); margin: 0 0 12px; vertical-align: top; padding: 5px; background: #fff; box-shadow: 3px 3px 0 rgba(46, 42, 38, .16); cursor: zoom-in }
+/* the big one is sized from the page height so it and a pair below always fit on one page */
+.pic.big { width: min(100%, calc((var(--ph, 560px) * .58 - 30px) * var(--ar, 1.5) + 10px)) }
+.pic:not(.big) img { max-height: calc(var(--ph, 560px) * .42 - 34px) }
+.pic.left { margin-right: 12px }
+.pic img { display: block; width: 100%; height: auto; max-height: calc(var(--ph, 560px) - 40px); object-fit: contain }
 .pic:hover { translate: 0 -2px; box-shadow: 3px 5px 0 rgba(46, 42, 38, .2) }
 .enlarge { position: absolute; inset: 18px; z-index: 6; display: grid; grid-template-rows: minmax(0, 1fr) auto; place-items: center; gap: .7rem; padding: 24px; border: 0; background: rgba(30, 28, 25, .94); cursor: zoom-out }
 .enlarge img { max-width: 100%; max-height: 100%; width: auto; height: auto; padding: 6px; background: #fff }
@@ -314,14 +320,13 @@ thead th { border-top: 0 }
 .toc ol { list-style: none; padding: 0; margin: 0; columns: 2; column-gap: 3rem }
 .toc li { break-inside: avoid }
 .toc a { display: flex; align-items: flex-end; gap: .6rem; text-decoration: none; padding: .45rem 0 }
-.toc a small { display: block; font: 500 .78rem/1.4 var(--pix); color: var(--acc, var(--mute)) }
 .toc a i { flex: 1; border-bottom: 2px dotted var(--line); min-width: 1rem; margin-bottom: .4em }
 .toc a b { font: 500 .9rem/1 var(--pix) }
 .toc a:hover span { text-decoration: underline }
 
 .case section.blk { display: block }
 .case h2 { font: 400 clamp(1.9rem, 3.4vw, 2.6rem)/1.05 var(--title); color: var(--acc, var(--green)); margin-bottom: 1.2rem }
-.case h2[data-mk]::before { content: attr(data-mk); display: block; font: 500 .82rem/1.3 var(--pix); color: var(--mute); margin-bottom: .5rem }
+.case h2[data-ch]::before { content: attr(data-ch); display: block; font: 500 .82rem/1.3 var(--pix); color: var(--mute); margin-bottom: .5rem }
 .case p, .case li { max-width: 68ch }
 .lead { font-size: 1.12rem; line-height: 1.55 }
 .blk h3.s { font: 400 1.35rem/1.2 var(--title); color: var(--acc, var(--green)); margin: 2rem 0 .8rem }
@@ -468,6 +473,8 @@ footer { text-align: center; padding: 1.6rem 1rem; font: 500 .82rem/1 var(--pix)
   .turn.next { right: 18px }
   .folio { bottom: 24px }
   .enlarge { inset: 10px; padding: 12px }
+  .pic, .pic.left, .pic.big { width: 100%; margin-right: 0 }  /* one photo per row on a phone page */
+  .pic:not(.big) img { max-height: calc(var(--ph, 560px) - 40px) }
 }
 @media (max-width: 520px) {
   .idx { grid-template-columns: 1fr }
