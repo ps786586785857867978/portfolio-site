@@ -16,11 +16,18 @@ where she stands at the fork, the walking route along each path, where the path 
 the x position of every level / side quest stop, and the flag at the end of the main path
 (reaching it takes her back to the island).
 
-Photography: put five photos in img/photography/ named 01.jpg ... 05.jpg.
-Edit their titles in index.html (search for "Photo 1"). Until then the album shows "photo coming soon".
+Photography: your originals live in portfoliography/ (kept out of git and off the website).
+The album shows web copies, newest first, grouped by year: img/photography/NN.jpg (1600 px) and
+img/photography/thumbs/NN.jpg (640 px). To add a photo, make both sizes (for example with
+  sips -Z 1600 -s format jpeg -s formatOptions 72 in.jpg --out img/photography/45.jpg
+  sips -Z 640 -s format jpeg -s formatOptions 68 in.jpg --out img/photography/thumbs/45.jpg)
+and copy one of the <a class="pic"> lines in index.html (search for "photos-2026").
+RAW files (.ARW, .NEF) were skipped: export them to JPEG first if you want them in.
+
+The bowl on the title screen: CONFIG.bowl in script.js says where its water sits in the collage.
 
 Fonts: Jeju Hallasan (fonts/, SIL Open Font License, cut down to Latin letters and renamed
 "Hallasan Subset" as the licence asks), Jost and Pixelify Sans from Google Fonts.
 
 Files the pages still look for in /media (anything missing is simply hidden):
-  cv.pdf, og.png, eldora.mp4, dhl-care.mp4, lekalas.mp4, cultural-alleys-logo.png
+  Saule_Pranculyte_CV.pdf, og.png, eldora.mp4, dhl-care.mp4, lekalas.mp4, cultural-alleys-logo.png

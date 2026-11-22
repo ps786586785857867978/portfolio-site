@@ -21,6 +21,8 @@
   --px: 3px;
   /* pixel border with notched corners */
   --box: 0 calc(-1 * var(--px)) 0 var(--green-d), 0 var(--px) 0 var(--green-d), calc(-1 * var(--px)) 0 0 var(--green-d), var(--px) 0 0 var(--green-d);
+  /* small pixel-notched corners for tags and ribbons */
+  --notch: polygon(2px 0, calc(100% - 2px) 0, calc(100% - 2px) 2px, 100% 2px, 100% calc(100% - 2px), calc(100% - 2px) calc(100% - 2px), calc(100% - 2px) 100%, 2px 100%, 2px calc(100% - 2px), 0 calc(100% - 2px), 0 2px, 2px 2px);
   --arrow: polygon(0 0, 25% 0, 25% 12.5%, 50% 12.5%, 50% 25%, 75% 25%, 75% 37.5%, 100% 37.5%, 100% 62.5%, 75% 62.5%, 75% 75%, 50% 75%, 50% 87.5%, 25% 87.5%, 25% 100%, 0 100%)
 }
 
@@ -52,7 +54,7 @@ button { color: inherit; font: inherit }
 .skip:focus { left: 1rem; top: 1rem; z-index: 60; background: var(--cream); padding: .5rem 1rem }
 
 /* stepped play arrows */
-.btn::before, .menu button::before, #menu li > *::before, .turn::before, .dir::before {
+.btn::before, .menu button::before, .ghost span::before, #menu li > *::before, .turn::before, .dir::before {
   content: "";
   flex: none;
   width: .5em;
@@ -75,16 +77,26 @@ html.is-game, html.is-game body { height: 100%; overflow: hidden }
 .wordmark { position: absolute; left: 15.24%; top: 9.93%; margin: 0; font: 400 13.41cqw/1 var(--title); color: var(--green); white-space: nowrap }
 .menu { position: absolute; left: 60.25%; top: 31.8%; display: flex; flex-direction: column; align-items: flex-start }
 .menu button, .menu span { position: relative; display: block; font: 400 4.77cqw/5.924cqw var(--title); color: var(--green); background: none; border: 0; padding: 0; text-align: left; white-space: nowrap; cursor: pointer }
-.menu button::before { position: absolute; left: -.9em; top: .42em; width: .45em; height: .6em; opacity: 0 }
-.menu button:hover::before, .menu button:focus-visible::before { opacity: 1 }
-.menu button:focus-visible { outline: 0; text-decoration: underline; text-decoration-thickness: .06em }
+/* hover or focus: an arrow, and a chunky strike through the word. The white copy inside the cursor reveal does the same. */
+.menu button::before, .ghost span::before { position: absolute; left: -.9em; top: .42em; width: .45em; height: .6em; opacity: 0 }
+.menu button::after, .ghost span::after { content: ""; position: absolute; left: -.06em; top: 54%; width: 0; height: .09em; background: currentColor; transition: width .2s steps(5) }
+.menu button:focus-visible { outline: 0 }
+.menu button:is(:hover, :focus-visible, .chosen)::before,
+.art:has([data-menu="start"]:is(:hover, :focus-visible, .chosen)) .ghost span:nth-child(1)::before,
+.art:has([data-menu="about"]:is(:hover, :focus-visible, .chosen)) .ghost span:nth-child(2)::before,
+.art:has([data-menu="resume"]:is(:hover, :focus-visible, .chosen)) .ghost span:nth-child(3)::before { opacity: 1 }
+.menu button:is(:hover, :focus-visible, .chosen)::after,
+.art:has([data-menu="start"]:is(:hover, :focus-visible, .chosen)) .ghost span:nth-child(1)::after,
+.art:has([data-menu="about"]:is(:hover, :focus-visible, .chosen)) .ghost span:nth-child(2)::after,
+.art:has([data-menu="resume"]:is(:hover, :focus-visible, .chosen)) .ghost span:nth-child(3)::after { width: calc(100% + .12em) }
 .menu button.chosen { animation: blink .14s steps(1) 3 }
-.menu button.chosen::before { opacity: 1 }
 @keyframes blink { 50% { opacity: 0 } }
 /* script.js clips this to the lit cells around the pointer */
 .px { position: absolute; inset: 0; pointer-events: none; clip-path: inset(50%) }
 .px img { image-rendering: pixelated }
 .ghost span { color: #fff; cursor: default }
+/* soapy water and bubbles in the bowl, drawn by script.js on a 296-pixel-wide grid of the picture */
+.bowl { position: absolute; left: calc(196 / 296 * 100%); top: calc(108 / 197.6 * 100%); width: calc(88 / 296 * 100%); height: calc(74 / 197.6 * 100%); image-rendering: pixelated; pointer-events: none }
 .skip-link { position: absolute; right: 1.2rem; bottom: 1.1rem; font: 500 .95rem var(--pix); color: var(--green-d); background: rgba(251, 244, 232, .85); padding: .5rem .8rem; text-decoration: none; box-shadow: var(--box) }
 .skip-link:hover { background: var(--cream) }
 /* the dive into the mirror (Figma frame 3), drawn on a canvas by script.js */
@@ -102,8 +114,13 @@ html.is-game, html.is-game body { height: 100%; overflow: hidden }
 .way { position: absolute; z-index: 4; left: calc(var(--x) / var(--sw) * 100%); top: calc(var(--y) / var(--sh) * 100%); translate: -50% -100%; display: flex; flex-direction: column; align-items: center; gap: .25em; font: 400 clamp(1.1rem, 2.1vw, 1.9rem)/1 var(--title); color: var(--green); background: var(--cream); border: 0; padding: .55em .8em .5em; margin: var(--px); box-shadow: var(--box); cursor: pointer; white-space: nowrap }
 .way small { font: 500 max(.75rem, .45em)/1 var(--pix); color: var(--mute) }
 .way::after { content: ""; position: absolute; left: 50%; top: calc(100% + var(--px)); height: var(--lead, 40px); border-left: 2px dashed var(--green) }
-.way.on, .way:hover { background: var(--green); color: var(--cream) }
-.way.on small, .way:hover small { color: var(--paper) }
+/* lit only while hovered, pressed or reached with the keyboard */
+.way:active, .way:focus-visible { background: var(--green); color: var(--cream) }
+.way:active small, .way:focus-visible small { color: var(--paper) }
+@media (hover: hover) {
+  .way:hover { background: var(--green); color: var(--cream) }
+  .way:hover small { color: var(--paper) }
+}
 
 /* --- 3. side-scrolling paths --- */
 .path.main { background: linear-gradient(#F0CDB2 0 60%, #9C8574 60%) }
@@ -175,45 +192,88 @@ dialog::backdrop { background: rgba(30, 28, 25, .6) }
 #menu li > :hover::before, #menu li > :focus-visible::before, #menu li button:hover::before, #menu li button:focus-visible::before { visibility: visible }
 
 /* ================= the pixel journal (case studies, NGO, photography, about) ================= */
+/* After the journal refs: a green cover with stepped corners and gold clips, bookmark tabs on top,
+   dotted-grid pages either side of a ring binding, chapter tags, striped ribbons and dotted rules. */
 #book { padding: 0; border: 0; background: transparent; overflow: visible; max-width: none; max-height: none; margin: auto }
 #book[open] { animation: pop .3s steps(3) }
 @keyframes pop { from { opacity: 0; transform: translateY(18px) } }
-.book { position: relative; width: min(1180px, 90vw); height: min(780px, 86svh); background: var(--green); padding: 16px; box-shadow: var(--box), 0 30px 60px rgba(0, 0, 0, .45); --gap: 96px }
-.pages { position: relative; height: 100%; padding: 34px 44px 58px; background: linear-gradient(90deg, transparent calc(50% - 26px), rgba(110, 80, 50, .14) 50%, transparent calc(50% + 26px)), var(--paper); box-shadow: inset 0 0 0 3px #E3D0B5 }
+.book { --gap: 108px; --s: 6px; position: relative; width: min(1180px, 92vw); height: min(760px, calc(100svh - 96px)); margin-top: 34px; padding: 18px; filter: drop-shadow(0 10px 0 rgba(28, 40, 38, .4)) }
+.book::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--green); box-shadow: inset 0 -6px 0 var(--green-d), inset 0 4px 0 #5C8682; clip-path: polygon(calc(2 * var(--s)) 0, calc(100% - 2 * var(--s)) 0, calc(100% - 2 * var(--s)) var(--s), calc(100% - var(--s)) var(--s), calc(100% - var(--s)) calc(2 * var(--s)), 100% calc(2 * var(--s)), 100% calc(100% - 2 * var(--s)), calc(100% - var(--s)) calc(100% - 2 * var(--s)), calc(100% - var(--s)) calc(100% - var(--s)), calc(100% - 2 * var(--s)) calc(100% - var(--s)), calc(100% - 2 * var(--s)) 100%, calc(2 * var(--s)) 100%, calc(2 * var(--s)) calc(100% - var(--s)), var(--s) calc(100% - var(--s)), var(--s) calc(100% - 2 * var(--s)), 0 calc(100% - 2 * var(--s)), 0 calc(2 * var(--s)), var(--s) calc(2 * var(--s)), var(--s) var(--s), calc(2 * var(--s)) var(--s)) }
+.book::after { content: ""; position: absolute; inset: -8px; z-index: 4; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10' shape-rendering='crispEdges'%3E%3Cg transform='matrix(1 0 0 1 0 0)'%3E%3Cpath fill='%237A4E16' d='M0 0h10v4H4v6H0z'/%3E%3Cpath fill='%23E0A23A' d='M1 1h8v2H3v6H1z'/%3E%3Cpath fill='%23F7D486' d='M1 1h8v1H2v7H1z'/%3E%3C/g%3E%3C/svg%3E") left top / 30px no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10' shape-rendering='crispEdges'%3E%3Cg transform='matrix(-1 0 0 1 10 0)'%3E%3Cpath fill='%237A4E16' d='M0 0h10v4H4v6H0z'/%3E%3Cpath fill='%23E0A23A' d='M1 1h8v2H3v6H1z'/%3E%3Cpath fill='%23F7D486' d='M1 1h8v1H2v7H1z'/%3E%3C/g%3E%3C/svg%3E") right top / 30px no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10' shape-rendering='crispEdges'%3E%3Cg transform='matrix(1 0 0 -1 0 10)'%3E%3Cpath fill='%237A4E16' d='M0 0h10v4H4v6H0z'/%3E%3Cpath fill='%23E0A23A' d='M1 1h8v2H3v6H1z'/%3E%3Cpath fill='%23F7D486' d='M1 1h8v1H2v7H1z'/%3E%3C/g%3E%3C/svg%3E") left bottom / 30px no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10' shape-rendering='crispEdges'%3E%3Cg transform='matrix(-1 0 0 -1 10 10)'%3E%3Cpath fill='%237A4E16' d='M0 0h10v4H4v6H0z'/%3E%3Cpath fill='%23E0A23A' d='M1 1h8v2H3v6H1z'/%3E%3Cpath fill='%23F7D486' d='M1 1h8v1H2v7H1z'/%3E%3C/g%3E%3C/svg%3E") right bottom / 30px no-repeat }
+.pages { position: relative; height: 100%; padding: 40px 54px 62px; background: linear-gradient(90deg, transparent calc(50% - 34px), rgba(70, 50, 30, .18) 50%, transparent calc(50% + 34px)), radial-gradient(circle at 1px 1px, rgba(68, 105, 102, .17) 1px, transparent 1.4px) 0 0 / 16px 16px, #FBF5EA; box-shadow: 0 4px 0 #E2D3B8, 0 8px 0 #CDBB99 }
+.pages::before, .pages::after { content: ""; position: absolute; top: 14px; bottom: 14px; border: 2px dotted rgba(68, 105, 102, .3); pointer-events: none }
+.pages::before { left: 14px; right: calc(50% + 36px) }
+.pages::after { left: calc(50% + 36px); right: 14px }
 .flow { position: relative; height: 100%; column-count: 2; column-gap: var(--gap); column-fill: auto; overflow: hidden }
-.rings { position: absolute; left: 50%; top: 30px; bottom: 30px; width: 54px; translate: -50% 0; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 27 70' shape-rendering='crispEdges'%3E%3Crect x='3' y='30' width='21' height='8' fill='%233A3833'/%3E%3Crect x='1' y='32' width='25' height='4' fill='%233A3833'/%3E%3Crect x='4' y='32' width='19' height='2' fill='%23A39CA8'/%3E%3Crect x='4' y='34' width='19' height='1' fill='%2366606C'/%3E%3C/svg%3E") center / 54px 140px repeat-y }
-.tabs { position: absolute; right: 100%; top: 44px; max-height: calc(100% - 88px); display: flex; flex-direction: column; gap: 4px; overflow-y: auto; scrollbar-width: none }
+.rings { position: absolute; left: 50%; top: 44px; bottom: 44px; width: 64px; translate: -50% 0; z-index: 2; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 60' shape-rendering='crispEdges'%3E%3Crect x='4' y='26' width='24' height='8' fill='%232F3A38'/%3E%3Crect x='2' y='28' width='28' height='4' fill='%232F3A38'/%3E%3Crect x='5' y='27' width='22' height='2' fill='%23A9BCB8'/%3E%3Crect x='5' y='29' width='22' height='1' fill='%235E7370'/%3E%3Crect x='0' y='29' width='3' height='2' fill='%231E2625'/%3E%3Crect x='29' y='29' width='3' height='2' fill='%231E2625'/%3E%3C/svg%3E") center / 64px 120px space }
+/* bookmarks along the top edge, tucked behind the cover; the open chapter stands up in page colour */
+.tabs { position: absolute; left: 44px; right: 96px; bottom: calc(100% - 10px); z-index: -2; display: flex; align-items: flex-end; gap: 4px; padding-top: 10px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none }
 .tabs::-webkit-scrollbar { display: none }
-.tab { flex: none; writing-mode: vertical-rl; rotate: 180deg; max-height: 9.5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 .82rem/1 var(--pix); color: var(--ink); background: var(--tc); border: 0; border-radius: 0 6px 6px 0; padding: .8rem .5rem; translate: 6px 0; cursor: pointer }
+.tab { flex: none; font: 500 .8rem/1 var(--pix); color: var(--ink); background: var(--tc); border: 0; padding: .6rem .75rem 1.2rem; translate: 0 8px; cursor: pointer; clip-path: polygon(0 4px, 4px 4px, 4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% 100%, 0 100%); transition: translate .1s steps(2) }
 .tab:nth-child(5n+1) { --tc: #E9B79A }
 .tab:nth-child(5n+2) { --tc: #C9D6C2 }
 .tab:nth-child(5n+3) { --tc: #E8D9A8 }
 .tab:nth-child(5n+4) { --tc: #D7B8C4 }
 .tab:nth-child(5n) { --tc: #B9CBD3 }
-.tab:hover { translate: 2px 0 }
-.tab[aria-current="true"] { --tc: var(--paper); translate: -2px 0; box-shadow: inset 0 0 0 2px var(--green) }
-.close { position: absolute; top: -16px; right: -16px; width: 44px; height: 44px; border: 0; cursor: pointer; background: var(--red) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 9' shape-rendering='crispEdges' fill='%23fff'%3E%3Crect x='1' y='1' width='2' height='1'/%3E%3Crect x='2' y='2' width='2' height='1'/%3E%3Crect x='3' y='3' width='3' height='1'/%3E%3Crect x='4' y='4' width='1' height='1'/%3E%3Crect x='3' y='5' width='3' height='1'/%3E%3Crect x='2' y='6' width='2' height='1'/%3E%3Crect x='1' y='7' width='2' height='1'/%3E%3Crect x='6' y='1' width='2' height='1'/%3E%3Crect x='5' y='2' width='2' height='1'/%3E%3Crect x='5' y='6' width='2' height='1'/%3E%3Crect x='6' y='7' width='2' height='1'/%3E%3C/svg%3E") center / 22px no-repeat; box-shadow: var(--box) }
+.tab:hover, .tab:focus-visible { translate: 0 3px; outline: 0 }
+.tab:focus-visible { text-decoration: underline }
+.tab[aria-current="true"] { translate: 0 0; background: #FBF5EA; color: var(--acc, var(--green-d)) }
+.close { position: absolute; top: 30px; right: -22px; z-index: 5; width: 44px; height: 44px; border: 0; cursor: pointer; background: var(--red) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 9' shape-rendering='crispEdges' fill='%23fff'%3E%3Crect x='1' y='1' width='2' height='1'/%3E%3Crect x='2' y='2' width='2' height='1'/%3E%3Crect x='3' y='3' width='3' height='1'/%3E%3Crect x='4' y='4' width='1' height='1'/%3E%3Crect x='3' y='5' width='3' height='1'/%3E%3Crect x='2' y='6' width='2' height='1'/%3E%3Crect x='1' y='7' width='2' height='1'/%3E%3Crect x='6' y='1' width='2' height='1'/%3E%3Crect x='5' y='2' width='2' height='1'/%3E%3Crect x='5' y='6' width='2' height='1'/%3E%3Crect x='6' y='7' width='2' height='1'/%3E%3C/svg%3E") center / 22px no-repeat; box-shadow: var(--box), inset 0 -4px 0 rgba(0, 0, 0, .25) }
 .close:hover { filter: brightness(1.1) }
-.turn { position: absolute; bottom: 30px; z-index: 2; width: 46px; height: 34px; display: grid; place-items: center; border: 0; background: var(--green); color: var(--cream); font-size: 1.1rem; box-shadow: var(--box); cursor: pointer }
-.turn.prev { left: 34px }
+.turn { position: absolute; bottom: 32px; z-index: 3; width: 44px; height: 34px; display: grid; place-items: center; border: 0; background: var(--green); color: var(--cream); font-size: 1.1rem; box-shadow: var(--box), inset 0 -4px 0 rgba(0, 0, 0, .2); cursor: pointer }
+.turn.prev { left: 38px }
 .turn.prev::before { scale: -1 1 }
-.turn.next { right: 34px }
-.turn:disabled { opacity: .3; cursor: default }
-.folio { position: absolute; left: 0; right: 0; bottom: 36px; margin: 0; text-align: center; font: 500 .82rem var(--pix); color: var(--mute); pointer-events: none }
+.turn.next { right: 38px }
+.turn:hover { filter: brightness(1.12) }
+.turn:disabled { opacity: .3; cursor: default; filter: none }
+.folio { position: absolute; left: 50%; bottom: 26px; translate: -50% 0; z-index: 3; margin: 0; font: 500 .76rem/1 var(--pix); color: var(--cream); background: var(--green); padding: .4rem .6rem .35rem; box-shadow: var(--box); white-space: nowrap; pointer-events: none }
 
-/* content inside the book flows into two columns = one spread */
-.flow .case, .flow .wrap { display: block; margin: 0; padding: 0; max-width: none; background: none }
+/* content inside the book flows into two columns = one spread; every chapter starts on a fresh page */
+.flow .case, .flow .case .wrap { display: block; margin: 0; padding: 0; max-width: none; background: none }
 .flow .chead, .flow .case section.blk { display: block; break-before: column; padding: 0; margin: 0; border: 0; background: none; box-shadow: none }
 .flow .chead { break-before: auto }
 .flow .chead::after, .flow .case section.blk::after, .flow .toc { display: none }
-.flow img, .flow video { max-height: calc(var(--ph, 560px) - 30px); width: auto }
-.flow .chead h1 { font-size: 2.8rem }
-.flow .case h2 { font-size: 2.1rem }
-.flow p, .flow li, .flow td { font-size: .95rem; line-height: 1.55 }
-.flow .cards, .flow .cards.c2, .flow .impact { grid-template-columns: minmax(0, 1fr) }
+.flow img, .flow video { max-height: calc(var(--ph, 560px) - 40px); width: auto }
+.flow p, .flow li, .flow td, .flow dd { font-size: .94rem; line-height: 1.55 }
+.flow p { orphans: 3; widows: 3 }
+.flow h3, .flow dt, .flow .age, .flow .kicker, .flow .legend { break-after: avoid }
+.flow h2 { break-inside: avoid }  /* chapters open at a page top; if what follows is too tall, the title stands as an opener page */
+.flow .cards, .flow .cards.c2, .flow .impact { display: block }  /* plain blocks: grid items ignore break-inside and split across pages */
 .flow .stats, .flow .case .stats { grid-template-columns: repeat(2, minmax(0, 1fr)) }
-.flow figure, .flow .card, .flow .stat, .flow tr, .flow .sw, .flow .lg, .flow .ph, .flow .bw, .flow .frame, .flow li, .flow details, .flow .dl div, .flow .idx div { break-inside: avoid }
+.flow figure, .flow .card, .flow .stat, .flow tr, .flow .sw, .flow .lg, .flow .ph, .flow .bw, .flow .frame, .flow li, .flow details, .flow .dl div, .flow .idx div, .flow .pic, .flow .chart { break-inside: avoid }
+/* cover page: a tag, the logo and facts on the left; the hero picture taped in on the right */
+.flow .chead::before { display: table; margin-bottom: 1.3rem; font: 500 .8rem/1 var(--pix); color: var(--cream); background: var(--acc, var(--green)); padding: .45rem .7rem .4rem; clip-path: var(--notch) }
+.flow .chead h1 { font-size: 2.8rem }
 .flow .chead > * + * { margin-top: 1.4rem }
+.flow .chead > div + div { break-before: column; margin: 0; height: calc(var(--ph, 560px) - 4px); display: grid; place-items: center }
+.flow .chead > div + div > * { position: relative; max-width: 92%; rotate: -1.5deg; filter: drop-shadow(5px 6px 0 rgba(46, 42, 38, .16)) }
+.flow .chead > div + div > *::before { content: ""; position: absolute; z-index: 1; top: -12px; left: calc(50% - 46px); width: 92px; height: 24px; rotate: 3deg; background: rgba(233, 196, 120, .8); clip-path: polygon(0 0, 100% 0, 95% 25%, 100% 50%, 95% 75%, 100% 100%, 0 100%, 5% 75%, 0 50%, 5% 25%) }
+.flow .chead > div + div img { max-height: calc(var(--ph, 560px) - 90px) }
+/* chapter opening: a filled tag with its game name, the title, then a dotted rule */
+.flow .case h2 { font-size: 2.05rem; margin-bottom: 1.3rem; padding-bottom: 1rem; background: radial-gradient(circle, color-mix(in srgb, var(--acc, var(--green)) 65%, transparent) 1.5px, transparent 2px) left bottom / 10px 4px repeat-x }
+.flow .case h2[data-mk]::before { display: table; font: 500 .74rem/1 var(--pix); color: var(--cream); background: var(--acc, var(--green)); padding: .4rem .6rem .35rem; margin-bottom: .8rem; clip-path: var(--notch) }
+.flow .blk h3.s { display: table; font-size: 1.12rem; padding: .4rem .7rem .3rem; margin: 1.7rem 0 .9rem; background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--acc, var(--green)) 17%, transparent) 0 6px, color-mix(in srgb, var(--acc, var(--green)) 8%, transparent) 6px 12px); clip-path: var(--notch) }
+.flow .blk h3.s:first-child { margin-top: 0 }
+.flow .card { --edge: color-mix(in srgb, var(--acc, var(--green)) 38%, transparent); margin: 2px 2px 1rem; box-shadow: 0 -2px 0 var(--edge), 0 2px 0 var(--edge), -2px 0 0 var(--edge), 2px 0 0 var(--edge) }
+/* inline-blocks never split, so a card always moves to the next page whole (break-inside alone was ignored here) */
+.flow .cards { font-size: 0; line-height: 0 }
+.flow .card { display: inline-block; width: calc(100% - 4px); vertical-align: top; font-size: 1rem; line-height: 1.6; padding: .85rem 1rem }
+.flow .card .dl { margin-top: .6rem }
+.flow .card .dl div { padding: .32rem 0; font-size: .84rem; line-height: 1.4 }
+.flow .card .dl dt { font-size: .74rem; line-height: 1.5 }
+.flow .stat { border: 0; padding: .75rem .85rem .8rem; background: color-mix(in srgb, var(--acc, var(--green)) 8%, transparent); box-shadow: inset 0 3px 0 var(--acc, var(--green)) }
+.flow .bw, .flow .frame, .flow .lg { box-shadow: 5px 5px 0 rgba(46, 42, 38, .14) }
+.flow .ph { box-shadow: 4px 4px 0 rgba(46, 42, 38, .14) }
+
+/* the album: photos two to a row; one opens big on top of the book */
+.photos { font-size: 0; line-height: 0; orphans: 1; widows: 1 }  /* each row of photos is a line: let pages fill up */
+.pic { display: inline-block; width: calc(50% - 6px); margin: 0 12px 12px 0; vertical-align: top; padding: 5px; background: #fff; box-shadow: 3px 3px 0 rgba(46, 42, 38, .16); cursor: zoom-in }
+.pic:nth-child(2n) { margin-right: 0 }
+.pic img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover }
+.pic:hover { translate: 0 -2px; box-shadow: 3px 5px 0 rgba(46, 42, 38, .2) }
+.enlarge { position: absolute; inset: 18px; z-index: 6; display: grid; grid-template-rows: minmax(0, 1fr) auto; place-items: center; gap: .7rem; padding: 24px; border: 0; background: rgba(30, 28, 25, .94); cursor: zoom-out }
+.enlarge img { max-width: 100%; max-height: 100%; width: auto; height: auto; padding: 6px; background: #fff }
+.enlarge span { font: 500 .85rem/1 var(--pix); color: var(--paper) }
 
 /* ================= book & case study content (also used by the standalone case pages) ================= */
 header.hud { position: sticky; top: 0; z-index: 10; background: var(--cream); box-shadow: 0 var(--px) 0 var(--green-d) }
@@ -376,6 +436,7 @@ footer { text-align: center; padding: 1.6rem 1rem; font: 500 .82rem/1 var(--pix)
   .wordmark { left: 38.6%; translate: -50% 0; top: 3.5%; font-size: min(15vw, 8svh) }
   .menu { left: 38.6%; translate: -50% 0; top: 12.5%; align-items: center }
   .menu button, .menu span { font-size: min(7.4vw, 3.8svh); line-height: 1.2 }
+  .bowl { display: none }  /* cropped out of view here */
   .iso-box { width: max(94vw, min((100svh - 260px) * 1.6, 160vw)) }
   .iso-view { place-items: center start; padding-bottom: 240px }
 }
@@ -395,18 +456,18 @@ footer { text-align: center; padding: 1.6rem 1rem; font: 500 .82rem/1 var(--pix)
   th { width: 40% }
 }
 @media (max-width: 760px) {
-  .book { width: 96vw; height: 90svh; padding: 10px; display: flex; flex-direction: column; --gap: 40px }
+  .book { width: 96vw; height: calc(100svh - 70px); margin-top: 36px; padding: 10px; --gap: 40px; --s: 4px }
   .flow { column-count: 1 }
-  .pages { flex: 1; min-height: 0; padding: 22px 20px 56px; background: var(--paper) }
-  .rings { display: none }
-  .tabs { position: static; flex-direction: row; max-height: none; overflow-x: auto; padding: 0 44px 0 0; margin-bottom: 6px }
-  .tab { writing-mode: horizontal-tb; rotate: none; translate: 0; border-radius: 6px 6px 0 0; padding: .5rem .7rem; max-height: none; max-width: 9rem }
-  .tab:hover, .tab[aria-current="true"] { translate: 0 }
-  .close { top: 6px; right: 6px; width: 38px; height: 38px }
-  .turn { bottom: 20px }
-  .turn.prev { left: 22px }
-  .turn.next { right: 22px }
-  .folio { bottom: 28px }
+  .pages { padding: 28px 22px 60px; background: radial-gradient(circle at 1px 1px, rgba(68, 105, 102, .17) 1px, transparent 1.4px) 0 0 / 16px 16px, #FBF5EA }
+  .pages::before { left: 8px; right: 8px; top: 8px; bottom: 8px }
+  .pages::after, .rings { display: none }
+  .tabs { left: 10px; right: 50px }
+  .close { top: -16px; right: -8px; width: 40px; height: 40px }
+  .turn { bottom: 18px }
+  .turn.prev { left: 18px }
+  .turn.next { right: 18px }
+  .folio { bottom: 24px }
+  .enlarge { inset: 10px; padding: 12px }
 }
 @media (max-width: 520px) {
   .idx { grid-template-columns: 1fr }

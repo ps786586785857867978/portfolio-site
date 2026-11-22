@@ -14,6 +14,7 @@
       main: { width: 1100, start: 70, flag: 1070, stops: { lekalas: 315, eldora: 590, 'dhl-care': 885 } },
       side: { width: 900, start: 70, stops: { ngo: 330, photography: 670 } }
     },
+    bowl: { x: .8117, y: .8249, rx: .0924, ry: .0363, tilt: 8 },  // the water in the title collage's bowl: centre and radii as fractions of the picture, tilt in degrees
     groundY: 150, heroH: 37,  // hero size on the paths
     reach: 60,                // how close she must be for a dialogue to open
     speed: 85                 // walking speed, picture pixels per second
@@ -73,7 +74,8 @@
     const gap = () => parseFloat(getComputedStyle(flow).columnGap) || 0;
     const pitch = () => flow.clientWidth + gap();
     const cols = () => (getComputedStyle(flow).columnCount === '1' ? 1 : 2);
-    const spreads = () => Math.max(1, Math.round((flow.scrollWidth + gap()) / pitch()));
+    // an odd page count leaves half a spread: round up, or the last page can't be reached
+    const spreads = () => Math.max(1, Math.ceil((flow.scrollWidth + gap()) / pitch() - .02));
     const measure = () => {
       flow.style.setProperty('--ph', flow.clientHeight + 'px');
       book.starts = book.pages.map(p => Math.floor((p.offsetLeft + 2) / pitch()));
@@ -85,10 +87,12 @@
       prev.disabled = book.spread === 0;
       next.disabled = book.spread === n - 1;
       const c = cols(), first = book.spread * c + 1, total = n * c;
-      folio.textContent = c === 2 ? `pages ${first}-${Math.min(first + 1, total)} of ${total}` : `page ${first} of ${total}`;
+      folio.textContent = c === 2 ? `${first}–${Math.min(first + 1, total)} / ${total}` : `${first} / ${total}`;
       let active = 0;
       book.starts.forEach((s, k) => { if (s <= book.spread) active = k; });
       [...tabs.children].forEach((t, k) => t.setAttribute('aria-current', k === active));
+      const t = tabs.children[active];   // keep the open chapter's bookmark in view
+      if (t) tabs.scrollLeft = clamp(tabs.scrollLeft, t.offsetLeft + t.offsetWidth - tabs.clientWidth, t.offsetLeft);
     };
     const build = () => {
       book.pages = $$(':scope > .wrap > .chead, :scope > .wrap > section.blk', book.art).filter(p => !p.hidden);
@@ -103,7 +107,13 @@
       }));
       measure();
     };
+    // put the open article back where it came from (a fetched one is just dropped)
+    const putBack = () => {
+      if (book.art && book.home) book.home.append(book.art); else flow.replaceChildren();
+      book.art = null;
+    };
     const open = (art, home, target) => {
+      putBack();
       book.art = art;
       book.home = home;
       label(art);
@@ -129,9 +139,27 @@
       if (e.key === 'ArrowRight') turn(book.spread + 1);
     });
     bookD.addEventListener('click', e => { if (e.target === bookD) bookD.close(); });
+    // album photos open big on top of the book; a click or Esc puts them back
+    bookD.addEventListener('click', e => {
+      const pic = e.target.closest('.pic');
+      if (!pic) return;
+      e.preventDefault();
+      const big = document.createElement('button');
+      big.type = 'button';
+      big.className = 'enlarge';
+      big.setAttribute('aria-label', 'Close the photo');
+      big.innerHTML = '<img alt=""><span></span>';
+      $('img', big).src = pic.href;
+      $('img', big).alt = $('img', pic).alt;
+      $('span', big).textContent = pic.dataset.when;
+      big.addEventListener('click', () => { big.remove(); pic.focus(); });
+      $('.book', bookD).append(big);
+      big.focus();
+    });
+    bookD.addEventListener('cancel', e => { const big = $('.enlarge', bookD); if (big) { e.preventDefault(); big.click(); } });
     bookD.addEventListener('close', () => {
-      if (book.home) book.home.append(book.art); else flow.replaceChildren();
-      book.art = null;
+      $('.enlarge', bookD)?.remove();
+      if (!bookD.open) putBack();   // a late close event must not empty a book opened since
     });
     document.addEventListener('click', async e => {
       const a = e.target.closest('a[data-case], a[data-sheet]');
@@ -208,15 +236,17 @@
   function revealFrame(now) {
     const cw = art.clientWidth / GRID, r = (touch.matches ? 64 : 54) / cw, moving = now - movedAt < 140;
     if (inside) {
-      const ci = mx / cw, cj = my / cw, n = Math.ceil(r + 3);
+      // only cells under the pointer stay lit, so nothing is left behind it
+      const ci = mx / cw, cj = my / cw, n = Math.ceil(r + 1), was = new Map(lit);
+      lit.clear();
       for (let i = Math.floor(ci - n); i <= ci + n; i++) {
         for (let j = Math.floor(cj - n); j <= cj + n; j++) {
-          const d = Math.hypot(i + .5 - ci, j + .5 - cj), k = i + ',' + j;
-          if (d < r - 1.5) lit.set(k, moving ? now + 150 + Math.random() * 450 : Infinity);
-          else if (d < r + 1) {
-            if (!moving) d < r ? lit.set(k, Infinity) : lit.delete(k);
-            else if (!lit.has(k) && Math.random() < .15) lit.set(k, now + 40 + Math.random() * 200);
-          } else if (moving && d < r + 3 && Math.random() < .02) lit.set(k, now + 60 + Math.random() * 120);
+          const d = Math.hypot(i + .5 - ci, j + .5 - cj), k = i + ',' + j, end = was.get(k);
+          if (d < r - 1.5 || (!moving && d < r)) lit.set(k, Infinity);
+          else if (moving && d < r + 1) {           // the edge flickers while it moves
+            if (end > now && end !== Infinity) lit.set(k, end);
+            else if (Math.random() < .3) lit.set(k, now + 40 + Math.random() * 160);
+          }
         }
       }
     }
@@ -245,13 +275,97 @@
   const away = () => {
     inside = false;
     const now = performance.now();
-    for (const k of lit.keys()) lit.set(k, now + Math.random() * 300);
+    for (const k of lit.keys()) lit.set(k, now + Math.random() * 150);
     kick();
   };
   title.addEventListener('pointermove', point);
   title.addEventListener('pointerdown', point);
   title.addEventListener('pointerleave', away);
   title.addEventListener('pointerup', e => { if (e.pointerType === 'touch') away(); });
+
+  // The bowl on the washstand: soapy water with foam heaps, and pixel bubbles that drift up and pop.
+  // One canvas pixel is 1/296 of the picture (twice as fine as the reveal's blocks).
+  const bowl = $('.bowl', title), bctx = bowl.getContext('2d'), AH = 296 / 1.4978;
+  const BW = bowl.width = 88, BH = bowl.height = 74, B0X = 196, B0Y = 108;   // canvas size and where it sits, in those pixels
+  const B = CONFIG.bowl, bcx = B.x * 296 - B0X, bcy = B.y * AH - B0Y, brx = B.rx * 296, bry = B.ry * AH, tilt = B.tilt * Math.PI / 180;
+  const inWater = (x, y) => {
+    const dx = x + .5 - bcx, dy = y + .5 - bcy;
+    const u = dx * Math.cos(tilt) + dy * Math.sin(tilt), v = dy * Math.cos(tilt) - dx * Math.sin(tilt);
+    return (u / brx) ** 2 + (v / bry) ** 2 <= 1;
+  };
+  const water = [];
+  for (let y = 0; y < BH; y++) for (let x = 0; x < BW; x++) {
+    if (inWater(x, y)) water.push([x, y, !inWater(x - 1, y) || !inWater(x + 1, y) || !inWater(x, y - 1) || !inWater(x, y + 1)]);
+  }
+  const ring = (r, fill) => {
+    const o = [];
+    for (let y = -r - 1; y <= r + 1; y++) for (let x = -r - 1; x <= r + 1; x++) {
+      const d = Math.hypot(x, y);
+      if (fill ? d <= r + .3 : Math.abs(d - r) < .5) o.push([x, y]);
+    }
+    return o;
+  };
+  const RINGS = [[], ring(1), ring(2), ring(3)];
+  // foam heaps, placed along the water's long axis
+  const heaps = [[-.5, -.2, 3], [.05, -.45, 4], [.55, -.1, 3]].map(([u, v, r]) =>
+    [bcx + u * brx * Math.cos(tilt) - v * bry * Math.sin(tilt), bcy + u * brx * Math.sin(tilt) + v * bry * Math.cos(tilt), r]);
+  const SUDS = [[-.7, .25, .5], [.7, .25, .5], [0, 0, .65], [-.2, -.55, .45], [.35, -.4, .4]];
+  let bubbles = [], btick = 0, bowlOn = false, bowlLast = 0;
+  function drawBowl() {
+    btick++;
+    bctx.clearRect(0, 0, BW, BH);
+    for (const [x, y, rim] of water) {
+      bctx.fillStyle = rim ? ((x * 7 + y * 3 + (btick >> 2)) % 5 ? '#F4EFE5' : '#D8D0C0')   // foamy edge
+        : (x + y * 4 + btick) % 19 === 0 ? '#DCEBE5'                                         // glints drifting across
+        : y < bcy ? '#93B2AB' : '#A9C3BC';
+      bctx.fillRect(x, y, 1, 1);
+    }
+    heaps.forEach(([hx, hy, r], i) => {
+      const grow = ((btick >> 3) + i) % 2 * .5;   // the foam breathes
+      for (const [ox, oy, k] of SUDS) {             // a heap is a little cluster of suds
+        const rr = r * k + grow;
+        for (const [x, y] of ring(rr, true)) {
+          bctx.fillStyle = y > rr * .45 ? '#D8D0C0' : x + y < -rr * .7 ? '#FFFFFF' : '#F6F1E7';
+          bctx.fillRect(Math.round(hx + ox * r + x), Math.round(hy + oy * r + y), 1, 1);
+        }
+      }
+    });
+    if (reduce) return;
+    const px0 = mx / art.clientWidth * 296 - B0X, py0 = my / art.clientHeight * AH - B0Y;
+    const near = inside && px0 > 0 && px0 < BW && py0 > 0 && py0 < BH;   // more bubbles while the cursor is on the bowl
+    if (Math.random() < (near ? .7 : .2)) {
+      const [x, y] = water[Math.random() * water.length | 0];
+      bubbles.push({ x, y, r: [1, 1, 2, 2, 3][Math.random() * 5 | 0], vy: .5 + Math.random() * .7, ph: Math.random() * 6, life: 18 + Math.random() * 40 | 0, pop: 0 });
+    }
+    bubbles = bubbles.filter(b => {
+      const x = Math.round(b.x), y = Math.round(b.y);
+      bctx.fillStyle = '#FFFFFF';
+      if (b.pop) {   // pop: a little star, then gone
+        const d = b.r + 1, pts = b.pop === 1 ? [[d, 0], [-d, 0], [0, d], [0, -d]] : [[d, d], [-d, -d], [d, -d], [-d, d]];
+        pts.forEach(([dx, dy]) => bctx.fillRect(x + dx, y + dy, 1, 1));
+        return ++b.pop < 3;
+      }
+      b.y -= b.vy;
+      b.x += Math.sin(btick * .35 + b.ph) * .35;
+      if (--b.life <= 0 || b.y < b.r + 1) b.pop = 1;
+      bctx.globalAlpha = .9;
+      RINGS[b.r].forEach(([dx, dy]) => bctx.fillRect(x + dx, y + dy, 1, 1));
+      bctx.globalAlpha = 1;
+      if (b.r > 1) bctx.fillRect(x - 1, y - 1, 1, 1);   // shine
+      return true;
+    });
+  }
+  function bowlFrame(now) {
+    if (state !== 'title' || !bowl.offsetParent) { bowlOn = false; return; }   // off the title, or cropped away on phones
+    requestAnimationFrame(bowlFrame);
+    if (now - bowlLast < 80) return;   // about 12 frames a second, like a sprite
+    bowlLast = now;
+    drawBowl();
+  }
+  function startBowl() {
+    if (reduce) return drawBowl();
+    if (!bowlOn) { bowlOn = true; requestAnimationFrame(bowlFrame); }
+  }
 
   // "resume" picks up where she was last, also on a later visit
   let saved = null;
@@ -267,6 +381,7 @@
     cancelAnimationFrame(raf);
     remember();
     show('title', replace);
+    startBowl();
     if (!replace) $('.menu button', title).focus({ preventScroll: true });  // not on first load
   }
 
@@ -357,7 +472,6 @@
   }
   function pickWay(w, quiet) {
     way = w;
-    $$('.way', isoBox).forEach(b => b.classList.toggle('on', b.dataset.way === w));
     if (!quiet) { hero.dataset.pose = 'side'; hero.classList.toggle('flip', w === 'side'); }
   }
   async function toIso(from, replace) {
@@ -386,7 +500,8 @@
       hero.classList.remove('flip');
       busy = false;
     }
-    $(`.way[data-way="${way}"]`, isoBox).focus({ preventScroll: true });
+    // no auto-focus here: a focused path would light up before anyone hovers it (arrow keys still pick one)
+    document.activeElement?.blur();
   }
   async function goWay(w) {
     if (busy) return;
@@ -556,7 +671,7 @@
   addEventListener('resize', () => {
     if (state === 'main' || state === 'side') { layout(); render(); }
     if (state === 'iso') isoLayout();
-    if (state === 'title') kick();
+    if (state === 'title') { kick(); startBowl(); }
   });
 
   // Links like /#eldora, /#side-quests or /#contacts jump straight to that place.
